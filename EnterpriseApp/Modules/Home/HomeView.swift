@@ -17,8 +17,8 @@ struct HomeView: View {
     let onWishlistTap: () -> Void
     
     private let columns = [
-        GridItem(.flexible(), spacing: 10),
-        GridItem(.flexible(), spacing: 10)
+        GridItem(.flexible(), spacing: 8),
+        GridItem(.flexible(), spacing: 8)
     ]
     
     var body: some View {
@@ -49,14 +49,14 @@ struct HomeView: View {
             
             // Content
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 16) {
+                LazyVGrid(columns: columns, spacing: 12) {
                     ForEach(presenter.filteredProducts) { product in
                         ProductCardView(product: product) {
                             onProductTap(product)
                         }
                     }
                 }
-                .padding(.horizontal, 20) // Proper padding from screen edges
+                .padding(.horizontal, 16) // Reduced padding to give more width to cards
                 .padding(.top, 12)
                 .padding(.bottom, 20)
             }

@@ -14,42 +14,40 @@ struct ProductCardView: View {
     @StateObject private var wishlistDataManager = WishlistDataManager.shared
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
             // Product Image
             AsyncImageView(
                 url: product.imageURL,
                 width: nil,
-                height: 140,
+                height: 160,
                 contentMode: .fill
             )
             .cornerRadius(10)
             
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 // Product Title
                 Text(product.title)
-                    .font(.subheadline)
+                    .font(.headline)
                     .fontWeight(.semibold)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
-                    .frame(height: 36) // Fixed height for 2 lines
                 
                 // Product Description
                 Text(product.shortDescription)
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundColor(.secondary)
-                    .lineLimit(1)
+                    .lineLimit(2)
                     .multilineTextAlignment(.leading)
-                    .frame(height: 14) // Fixed height for 1 line
                 
                 // Rating and Stock
                 HStack {
                     if product.rating > 0 {
-                        HStack(spacing: 1) {
+                        HStack(spacing: 2) {
                             Image(systemName: "star.fill")
                                 .foregroundColor(.yellow)
-                                .font(.caption2)
+                                .font(.caption)
                             Text(String(format: "%.1f", product.rating))
-                                .font(.caption2)
+                                .font(.caption)
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -63,37 +61,33 @@ struct ProductCardView: View {
                             .fontWeight(.medium)
                     }
                 }
-                .frame(height: 16) // Fixed height for rating/stock section
                 
                 // Price
                 Text(product.formattedPrice)
-                    .font(.callout)
+                    .font(.title3)
                     .fontWeight(.bold)
                     .foregroundColor(.primary)
-                    .frame(height: 18) // Fixed height for price
                 
                 // Action Buttons
-                HStack(spacing: 4) {
+                HStack(spacing: 6) {
                     // Add to Cart Button
                     Button(action: {
                         cartDataManager.addToCart(product: product)
                     }) {
-                        HStack(spacing: 2) {
+                        HStack(spacing: 3) {
                             Image(systemName: "cart.badge.plus")
-                                .font(.caption2)
+                                .font(.caption)
                             Text("Add")
-                                .font(.caption2)
+                                .font(.caption)
                                 .fontWeight(.medium)
                         }
                         .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
                         .background(Color.blue)
-                        .cornerRadius(4)
+                        .cornerRadius(5)
                     }
                     .disabled(!product.isInStock)
-                    
-                    Spacer()
                     
                     // Wishlist Button
                     Button(action: {
@@ -104,19 +98,17 @@ struct ProductCardView: View {
                         }
                     }) {
                         Image(systemName: wishlistDataManager.isInWishlist(productId: product.id) ? "heart.fill" : "heart")
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundColor(wishlistDataManager.isInWishlist(productId: product.id) ? .red : .gray)
-                            .frame(width: 20, height: 20)
+                            .frame(width: 24, height: 24)
                     }
                 }
-                .frame(height: 28) // Fixed height for buttons
             }
             .padding(.horizontal, 2)
         }
-        .padding(8)
-        .frame(height: 250) // Fixed height to prevent overlapping
+        .padding(10)
         .background(Color(.systemBackground))
-        .cornerRadius(12)
+        .cornerRadius(14)
         .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
         .onTapGesture {
             onTap()
