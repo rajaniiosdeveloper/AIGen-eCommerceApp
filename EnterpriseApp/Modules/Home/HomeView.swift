@@ -16,10 +16,7 @@ struct HomeView: View {
     let onCartTap: () -> Void
     let onWishlistTap: () -> Void
     
-    private let columns = [
-        GridItem(.flexible(), spacing: 8),
-        GridItem(.flexible(), spacing: 8)
-    ]
+    // Removed grid columns - using list view now
     
     var body: some View {
         VStack(spacing: 0) {
@@ -47,18 +44,18 @@ struct HomeView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
             
-            // Content
+            // Content - List View
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 12) {
+                LazyVStack(spacing: 12) {
                     ForEach(presenter.filteredProducts) { product in
-                        ProductCardView(product: product) {
+                        ProductListRowView(product: product) {
                             onProductTap(product)
                         }
                     }
                 }
-                .padding(.horizontal, 16) // Reduced padding to give more width to cards
-                .padding(.top, 12)
-                .padding(.bottom, 20)
+                .padding(.horizontal, 20) // Side spacing from screen edges
+                .padding(.top, 16)
+                .padding(.bottom, 24)
             }
             .refreshable {
                 presenter.fetchProducts()
@@ -88,6 +85,100 @@ struct HomeView: View {
             if presenter.products.isEmpty {
                 presenter.fetchProducts()
             }
+        }
+    }
+}
+
+// MARK: - Product List Row View for List Layout
+struct ProductListRowView: View {
+    let product: Product
+    let onTap: () -> Void
+    @StateObject private var cartDataManager = CartDataManager.shared
+    @StateObject private var wishlistDataManager = WishlistDataManager.shared
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            // Product Image
+            AsyncImageView(
+                url: product.imageURL,
+                width: 80,
+                height: 80,
+                contentMode: .fill
+            )
+            .cornerRadius(8)
+            
+            // Product Info
+            VStack(alignment: .leading, spacing: 4) {
+                Text(product.title)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                
+                Text(product.shortDescription)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(1)
+                
+                HStack {
+                    if product.rating > 0 {
+                        HStack(spacing: 2) {
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.yellow)
+                                .font(.caption)
+                            Text(String(format: "%.1f", product.rating))
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    Text(product.formattedPrice)
+                        .font(.title3)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                }
+            }
+            
+            Spacer()
+            
+            // Action Buttons
+            VStack(spacing: 8) {
+                // Wishlist Button
+                Button(action: {
+                    if wishlistDataManager.isInWishlist(productId: product.id) {
+                        wishlistDataManager.removeFromWishlist(productId: product.id)
+                    } else {
+                        wishlistDataManager.addToWishlist(product: product)
+                    }
+                }) {
+                    Image(systemName: wishlistDataManager.isInWishlist(productId: product.id) ? "heart.fill" : "heart")
+                        .font(.title2)
+                        .foregroundColor(wishlistDataManager.isInWishlist(productId: product.id) ? .red : .gray)
+                        .frame(width: 32, height: 32)
+                }
+                
+                // Add to Cart Button
+                Button(action: {
+                    cartDataManager.addToCart(product: product)
+                }) {
+                    Image(systemName: "cart.badge.plus")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                        .frame(width: 32, height: 32)
+                        .background(product.isInStock ? Color.blue : Color.gray)
+                        .cornerRadius(8)
+                }
+                .disabled(!product.isInStock)
+            }
+        }
+        .padding(12)
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+        .onTapGesture {
+            onTap()
         }
     }
 }

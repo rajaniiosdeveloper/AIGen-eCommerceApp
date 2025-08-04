@@ -31,8 +31,8 @@ struct ProductDetailView: View {
                     contentMode: .fill
                 )
                 .cornerRadius(16)
-                .padding(.horizontal, 20)
-                .padding(.top, 10)
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
                 
                 VStack(alignment: .leading, spacing: 16) {
                     // Product Info
@@ -228,7 +228,7 @@ struct ProductDetailView: View {
                     }
                     .padding(.top, 8)
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 24)
             }
             .padding(.bottom, 20) // Add bottom padding for better spacing
         }
@@ -257,12 +257,12 @@ struct ProductDetailView: View {
                             Text("Added to Cart!")
                                 .fontWeight(.semibold)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 24)
                         .padding(.vertical, 12)
                         .background(Color(.systemBackground))
                         .cornerRadius(12)
                         .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 2)
-                        .padding(.horizontal, 20) // Ensure toast doesn't touch screen edges
+                        .padding(.horizontal, 24) // Ensure toast doesn't touch screen edges
                         .padding(.bottom, 120) // Safe distance from bottom
                     }
                     .transition(.move(edge: .bottom))
@@ -278,12 +278,12 @@ struct ProductDetailView: View {
                             Text("Added to Wishlist!")
                                 .fontWeight(.semibold)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 24)
                         .padding(.vertical, 12)
                         .background(Color(.systemBackground))
                         .cornerRadius(12)
                         .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 2)
-                        .padding(.horizontal, 20) // Ensure toast doesn't touch screen edges
+                        .padding(.horizontal, 24) // Ensure toast doesn't touch screen edges
                         .padding(.bottom, 120) // Safe distance from bottom
                     }
                     .transition(.move(edge: .bottom))

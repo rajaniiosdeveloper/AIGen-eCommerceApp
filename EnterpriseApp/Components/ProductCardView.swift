@@ -104,12 +104,12 @@ struct ProductCardView: View {
                     }
                 }
             }
-            .padding(.horizontal, 2)
+            .padding(.horizontal, 6)
         }
-        .padding(10)
+        .padding(12)
         .background(Color(.systemBackground))
         .cornerRadius(14)
-        .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
+        .shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: 2)
         .onTapGesture {
             onTap()
         }
