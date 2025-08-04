@@ -9,7 +9,79 @@ This project was generated using **Cursor-AI**, an AI-powered code editor that h
 - **Generation Date**: [Add date here]
 - **AI Prompt Used**: 
   ```
-  [Please add the specific prompt you used to generate this eCommerce app here]
+  Features Required:
+Homepage / List View:
+
+Display a list of items.
+
+Each item must include:
+
+Image
+
+Title
+
+Description
+
+Price
+
+Clicking on an item should open the Item Detail Page.
+
+Item Detail Page:
+
+Show full item details: image, title, description, price.
+
+Include 3 buttons:
+
+Add to Cart
+
+Add to Wishlist
+
+Buy Now
+
+Add to Wishlist:
+
+When clicked, add the item to the user’s Wishlist.
+
+Create a dedicated Wishlist Page that shows all saved items in a table view with columns: Image, Title, Price.
+
+Add to Cart:
+
+When clicked, add the item to the user’s Cart.
+
+Create a Cart Page showing all added items in list view with:
+
+Image, Title, Price per item
+
+Total items
+
+Final total price in rupees
+
+Buy Now:
+
+Redirect to a Payment Page
+
+Display the selected item's title, price, and description
+
+Include a simple payment placeholder (no real payment integration needed)
+
+Header (Top Navigation Bar on All Pages):
+
+Include icons for:
+
+Cart (clicking opens Cart Page)
+
+Wishlist (clicking opens Wishlist Page)
+
+Icons should show badge with count of items
+
+Additional Notes:
+Use modern UI components (e.g. Tailwind CSS, Material UI, or Bootstrap)
+
+Use state management for cart and wishlist (e.g. Redux, Context API, or Zustand)
+
+Backend can be mocked or use a JSON file/local storage or simple Express.js API
+
+Use React or Next.js for frontend if appropriate
   ```
 
 ## 📱 Project Overview
