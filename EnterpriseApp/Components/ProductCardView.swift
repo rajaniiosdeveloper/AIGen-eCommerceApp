@@ -14,17 +14,17 @@ struct ProductCardView: View {
     @StateObject private var wishlistDataManager = WishlistDataManager.shared
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             // Product Image
             AsyncImageView(
                 url: product.imageURL,
                 width: nil,
-                height: 180,
+                height: 160,
                 contentMode: .fill
             )
-            .cornerRadius(12)
+            .cornerRadius(10)
             
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 3) {
                 // Product Title
                 Text(product.title)
                     .font(.headline)
@@ -69,12 +69,12 @@ struct ProductCardView: View {
                     .foregroundColor(.primary)
                 
                 // Action Buttons
-                HStack(spacing: 8) {
+                HStack(spacing: 6) {
                     // Add to Cart Button
                     Button(action: {
                         cartDataManager.addToCart(product: product)
                     }) {
-                        HStack(spacing: 4) {
+                        HStack(spacing: 3) {
                             Image(systemName: "cart.badge.plus")
                                 .font(.caption)
                             Text("Add")
@@ -82,10 +82,10 @@ struct ProductCardView: View {
                                 .fontWeight(.medium)
                         }
                         .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
                         .background(Color.blue)
-                        .cornerRadius(6)
+                        .cornerRadius(5)
                     }
                     .disabled(!product.isInStock)
                     
@@ -104,12 +104,12 @@ struct ProductCardView: View {
                     }
                 }
             }
-            .padding(.horizontal, 4)
+            .padding(.horizontal, 2)
         }
-        .padding(12)
+        .padding(10)
         .background(Color(.systemBackground))
-        .cornerRadius(16)
-        .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .cornerRadius(14)
+        .shadow(color: .black.opacity(0.08), radius: 2, x: 0, y: 1)
         .onTapGesture {
             onTap()
         }

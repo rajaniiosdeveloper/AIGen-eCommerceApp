@@ -49,15 +49,16 @@ struct HomeView: View {
             
             // Content
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 16) {
+                LazyVGrid(columns: columns, spacing: 20) {
                     ForEach(presenter.filteredProducts) { product in
                         ProductCardView(product: product) {
                             onProductTap(product)
                         }
                     }
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 8)
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 20)
             }
             .refreshable {
                 presenter.fetchProducts()
