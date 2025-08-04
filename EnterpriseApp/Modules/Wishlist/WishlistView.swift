@@ -10,7 +10,6 @@ import Combine
 
 // MARK: - Wishlist View (VIPER)
 struct WishlistView: View {
-    @EnvironmentObject var store: AppStore
     @StateObject private var presenter = WishlistPresenter()
     @Environment(\.dismiss) private var dismiss
     
@@ -19,7 +18,7 @@ struct WishlistView: View {
     var body: some View {
         NavigationView {
             VStack {
-                if store.wishlistItems.isEmpty {
+                if presenter.wishlistItems.isEmpty {
                     // Empty Wishlist State
                     VStack(spacing: 20) {
                         Image(systemName: "heart")
@@ -60,7 +59,7 @@ struct WishlistView: View {
                             
                             Spacer()
                             
-                            Text("\(store.wishlistItemCount) items")
+                            Text("\(presenter.wishlistItemCount) items")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
@@ -70,10 +69,11 @@ struct WishlistView: View {
                         // Wishlist Items List
                         ScrollView {
                             LazyVStack(spacing: 16) {
-                                ForEach(store.wishlistItems, id: \.id) { wishlistItem in
+                                ForEach(presenter.wishlistItems, id: \.id) { wishlistItem in
                                     WishlistItemRowView(
                                         wishlistItem: wishlistItem,
-                                        onProductTap: onProductTap
+                                        onProductTap: onProductTap,
+                                        presenter: presenter
                                     )
                                 }
                             }
@@ -90,7 +90,7 @@ struct WishlistView: View {
                     }
                 }
                 
-                if !store.wishlistItems.isEmpty {
+                if !presenter.wishlistItems.isEmpty {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("Clear All") {
                             presenter.clearWishlist()
@@ -105,54 +105,45 @@ struct WishlistView: View {
 
 // MARK: - Wishlist Item Row View
 struct WishlistItemRowView: View {
-    let wishlistItem: WishlistItemEntity
-    @EnvironmentObject var store: AppStore
+    let wishlistItem: WishlistItem
     let onProductTap: (Product) -> Void
+    let presenter: WishlistPresenter
     
     var body: some View {
         HStack(spacing: 12) {
             // Product Image
             AsyncImageView(
-                url: wishlistItem.productImageURL ?? "",
+                url: wishlistItem.product.imageURL,
                 width: 80,
                 height: 80,
                 contentMode: .fill
             )
             .cornerRadius(12)
             .onTapGesture {
-                if let productId = wishlistItem.productId {
-                    // Find the full product from the store
-                    if let product = store.products.first(where: { $0.id == productId }) {
-                        onProductTap(product)
-                    }
-                }
+                onProductTap(wishlistItem.product)
             }
             
             // Product Info
             VStack(alignment: .leading, spacing: 6) {
-                Text(wishlistItem.productTitle ?? "")
+                Text(wishlistItem.product.title)
                     .font(.headline)
                     .fontWeight(.semibold)
                     .lineLimit(2)
                 
-                Text(wishlistItem.formattedPrice)
+                Text(wishlistItem.product.formattedPrice)
                     .font(.title3)
                     .fontWeight(.bold)
                     .foregroundColor(.primary)
                 
-                if let dateAdded = wishlistItem.dateAdded {
-                    Text("Added \(dateAdded, style: .relative)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                Text("Added \(wishlistItem.dateAdded, style: .relative)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
                 
                 // Action Buttons
                 HStack(spacing: 12) {
                     Button(action: {
-                        if let productId = wishlistItem.productId,
-                           let product = store.products.first(where: { $0.id == productId }) {
-                            store.addToCart(product: product)
-                        }
+                        // Get cart data manager to add item
+                        CartDataManager.shared.addToCart(product: wishlistItem.product)
                     }) {
                         HStack(spacing: 4) {
                             Image(systemName: "cart.badge.plus")
@@ -169,7 +160,7 @@ struct WishlistItemRowView: View {
                     }
                     
                     Button(action: {
-                        store.removeFromWishlist(productId: wishlistItem.productId ?? "")
+                        presenter.removeFromWishlist(productId: wishlistItem.product.id)
                     }) {
                         HStack(spacing: 4) {
                             Image(systemName: "heart.slash")
@@ -196,35 +187,10 @@ struct WishlistItemRowView: View {
     }
 }
 
-// MARK: - Wishlist Presenter (VIPER)
-class WishlistPresenter: ObservableObject {
-    private let interactor = WishlistInteractor()
-    
-    func removeFromWishlist(productId: String) {
-        interactor.removeFromWishlist(productId: productId)
-    }
-    
-    func clearWishlist() {
-        interactor.clearWishlist()
-    }
-}
-
-// MARK: - Wishlist Interactor (VIPER)
-class WishlistInteractor {
-    func removeFromWishlist(productId: String) {
-        AppStore.shared.removeFromWishlist(productId: productId)
-    }
-    
-    func clearWishlist() {
-        // Remove all wishlist items
-        for item in AppStore.shared.wishlistItems {
-            AppStore.shared.removeFromWishlist(productId: item.productId ?? "")
-        }
-    }
-}
+// MARK: - Legacy components (will be removed)
+// The new WishlistPresenter and WishlistInteractor are now in separate files
 
 // MARK: - Preview
 #Preview {
     WishlistView(onProductTap: { _ in })
-        .environmentObject(AppStore.shared)
 }

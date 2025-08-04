@@ -10,7 +10,6 @@ import Combine
 
 // MARK: - Cart View (VIPER)
 struct CartView: View {
-    @EnvironmentObject var store: AppStore
     @StateObject private var presenter = CartPresenter()
     @Environment(\.dismiss) private var dismiss
     
@@ -19,7 +18,7 @@ struct CartView: View {
     var body: some View {
         NavigationView {
             VStack {
-                if store.cartItems.isEmpty {
+                if presenter.cartItems.isEmpty {
                     // Empty Cart State
                     VStack(spacing: 20) {
                         Image(systemName: "cart")
@@ -60,7 +59,7 @@ struct CartView: View {
                             
                             Spacer()
                             
-                            Text("\(store.cartItemCount) items")
+                            Text("\(presenter.cartItemCount) items")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
@@ -70,8 +69,8 @@ struct CartView: View {
                         // Cart Items List
                         ScrollView {
                             LazyVStack(spacing: 16) {
-                                ForEach(store.cartItems, id: \.id) { cartItem in
-                                    CartItemRowView(cartItem: cartItem)
+                                ForEach(presenter.cartItems, id: \.id) { cartItem in
+                                    CartItemRowView(cartItem: cartItem, presenter: presenter)
                                 }
                             }
                             .padding(.horizontal)
@@ -91,7 +90,7 @@ struct CartView: View {
                                         .font(.body)
                                         .foregroundColor(.secondary)
                                     Spacer()
-                                    Text("\(store.cartItemCount)")
+                                    Text("\(presenter.cartItemCount)")
                                         .font(.body)
                                         .fontWeight(.semibold)
                                 }
@@ -101,7 +100,7 @@ struct CartView: View {
                                         .font(.title3)
                                         .fontWeight(.semibold)
                                     Spacer()
-                                    Text(store.formattedCartTotal)
+                                    Text(presenter.formattedCartTotal)
                                         .font(.title2)
                                         .fontWeight(.bold)
                                         .foregroundColor(.primary)
@@ -154,14 +153,14 @@ struct CartView: View {
 
 // MARK: - Cart Item Row View
 struct CartItemRowView: View {
-    let cartItem: CartItemEntity
-    @EnvironmentObject var store: AppStore
+    let cartItem: CartItem
+    let presenter: CartPresenter
     
     var body: some View {
         HStack(spacing: 12) {
             // Product Image
             AsyncImageView(
-                url: cartItem.productImageURL ?? "",
+                url: cartItem.product.imageURL,
                 width: 80,
                 height: 80,
                 contentMode: .fill
@@ -170,12 +169,12 @@ struct CartItemRowView: View {
             
             // Product Info
             VStack(alignment: .leading, spacing: 4) {
-                Text(cartItem.productTitle ?? "")
+                Text(cartItem.product.title)
                     .font(.headline)
                     .fontWeight(.semibold)
                     .lineLimit(2)
                 
-                Text(cartItem.formattedPrice)
+                Text(cartItem.product.formattedPrice)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 
@@ -191,9 +190,9 @@ struct CartItemRowView: View {
             VStack(spacing: 8) {
                 HStack(spacing: 12) {
                     Button(action: {
-                        store.updateCartItemQuantity(
-                            productId: cartItem.productId ?? "",
-                            quantity: Int(cartItem.quantity) - 1
+                        presenter.updateCartItemQuantity(
+                            productId: cartItem.product.id,
+                            quantity: cartItem.quantity - 1
                         )
                     }) {
                         Image(systemName: "minus")
@@ -211,9 +210,9 @@ struct CartItemRowView: View {
                         .frame(minWidth: 20)
                     
                     Button(action: {
-                        store.updateCartItemQuantity(
-                            productId: cartItem.productId ?? "",
-                            quantity: Int(cartItem.quantity) + 1
+                        presenter.updateCartItemQuantity(
+                            productId: cartItem.product.id,
+                            quantity: cartItem.quantity + 1
                         )
                     }) {
                         Image(systemName: "plus")
@@ -226,7 +225,7 @@ struct CartItemRowView: View {
                 }
                 
                 Button(action: {
-                    store.removeFromCart(productId: cartItem.productId ?? "")
+                    presenter.removeFromCart(productId: cartItem.product.id)
                 }) {
                     Text("Remove")
                         .font(.caption)
@@ -241,24 +240,10 @@ struct CartItemRowView: View {
     }
 }
 
-// MARK: - Cart Presenter (VIPER)
-class CartPresenter: ObservableObject {
-    private let interactor = CartInteractor()
-    
-    func clearCart() {
-        interactor.clearCart()
-    }
-}
-
-// MARK: - Cart Interactor (VIPER)
-class CartInteractor {
-    func clearCart() {
-        AppStore.shared.clearCart()
-    }
-}
+// MARK: - Legacy components (will be removed)
+// The new CartPresenter and CartInteractor are now in separate files
 
 // MARK: - Preview
 #Preview {
     CartView(onCheckout: {})
-        .environmentObject(AppStore.shared)
 }

@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var store = AppStore.shared
     @StateObject private var router = AppRouter()
     
     var body: some View {
@@ -24,7 +23,6 @@ struct ContentView: View {
                     router.navigateToWishlist()
                 }
             )
-            .environmentObject(store)
             .environmentObject(router)
         }
         .sheet(isPresented: $router.showingProductDetail) {
@@ -39,7 +37,6 @@ struct ContentView: View {
                             }
                         }
                     )
-                    .environmentObject(store)
                 }
             }
         }
@@ -50,7 +47,6 @@ struct ContentView: View {
                     router.navigateToCheckout()
                 }
             })
-            .environmentObject(store)
         }
         .sheet(isPresented: $router.showingWishlist) {
             WishlistView(onProductTap: { product in
@@ -59,14 +55,12 @@ struct ContentView: View {
                     router.navigateToProductDetail(product)
                 }
             })
-            .environmentObject(store)
         }
         .sheet(isPresented: $router.showingPayment) {
             PaymentView(
                 product: router.paymentProduct,
                 isFromCart: router.isPaymentFromCart
             )
-            .environmentObject(store)
         }
     }
 }

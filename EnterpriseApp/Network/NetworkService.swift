@@ -10,9 +10,14 @@ import Combine
 
 // MARK: - Network Service Protocol
 protocol NetworkServiceProtocol {
-    func fetchProducts() -> AnyPublisher<[Product], Error>
-    func fetchProduct(id: String) -> AnyPublisher<Product, Error>
-    func searchProducts(query: String) -> AnyPublisher<[Product], Error>
+    func fetchProducts() async throws -> [Product]
+    func fetchProduct(id: String) async throws -> Product
+    func searchProducts(query: String) async throws -> [Product]
+    
+    // Combine versions for backward compatibility
+    func fetchProductsPublisher() -> AnyPublisher<[Product], Error>
+    func fetchProductPublisher(id: String) -> AnyPublisher<Product, Error>
+    func searchProductsPublisher(query: String) -> AnyPublisher<[Product], Error>
 }
 
 // MARK: - Network Service Implementation
@@ -24,32 +29,134 @@ class NetworkService: NetworkServiceProtocol {
     
     private init() {}
     
-    func fetchProducts() -> AnyPublisher<[Product], Error> {
-        // For now, return mock data. In production, this would make real API calls
-        return Just(MockData.sampleProducts)
-            .setFailureType(to: Error.self)
-            .delay(for: .milliseconds(500), scheduler: DispatchQueue.main) // Simulate network delay
-            .eraseToAnyPublisher()
+    // MARK: - Async/Await API Methods
+    func fetchProducts() async throws -> [Product] {
+        // For development/demo purposes, we'll use mock data
+        // In production, uncomment the real API call below
+        
+        // Simulate network delay
+        try await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+        return MockData.sampleProducts
+        
+        // Real API implementation (uncomment for production):
+        /*
+        guard let url = URL(string: baseURL) else {
+            throw APIError(message: "Invalid URL", code: -1)
+        }
+        
+        let (data, response) = try await session.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              httpResponse.statusCode == 200 else {
+            throw APIError(message: "Invalid response", code: -1)
+        }
+        
+        let productsResponse = try JSONDecoder().decode(ProductsResponse.self, from: data)
+        return productsResponse.products
+        */
     }
     
-    func fetchProduct(id: String) -> AnyPublisher<Product, Error> {
-        return Just(MockData.sampleProducts.first(where: { $0.id == id }) ?? MockData.sampleProducts[0])
-            .setFailureType(to: Error.self)
-            .delay(for: .milliseconds(300), scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher()
+    func fetchProduct(id: String) async throws -> Product {
+        // Simulate network delay
+        try await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds
+        
+        if let product = MockData.sampleProducts.first(where: { $0.id == id }) {
+            return product
+        } else {
+            throw APIError(message: "Product not found", code: 404)
+        }
+        
+        // Real API implementation (uncomment for production):
+        /*
+        guard let url = URL(string: "\(baseURL)/\(id)") else {
+            throw APIError(message: "Invalid URL", code: -1)
+        }
+        
+        let (data, response) = try await session.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              httpResponse.statusCode == 200 else {
+            throw APIError(message: "Invalid response", code: -1)
+        }
+        
+        return try JSONDecoder().decode(Product.self, from: data)
+        */
     }
     
-    func searchProducts(query: String) -> AnyPublisher<[Product], Error> {
+    func searchProducts(query: String) async throws -> [Product] {
+        // Simulate network delay
+        try await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds
+        
         let filteredProducts = MockData.sampleProducts.filter { product in
             product.title.localizedCaseInsensitiveContains(query) ||
             product.description.localizedCaseInsensitiveContains(query) ||
             product.category.localizedCaseInsensitiveContains(query)
         }
         
-        return Just(filteredProducts)
-            .setFailureType(to: Error.self)
-            .delay(for: .milliseconds(300), scheduler: DispatchQueue.main)
-            .eraseToAnyPublisher()
+        return filteredProducts
+        
+        // Real API implementation (uncomment for production):
+        /*
+        guard let url = URL(string: "\(baseURL)/search?q=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")") else {
+            throw APIError(message: "Invalid URL", code: -1)
+        }
+        
+        let (data, response) = try await session.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              httpResponse.statusCode == 200 else {
+            throw APIError(message: "Invalid response", code: -1)
+        }
+        
+        let productsResponse = try JSONDecoder().decode(ProductsResponse.self, from: data)
+        return productsResponse.products
+        */
+    }
+    
+    // MARK: - Combine Compatibility Methods
+    func fetchProductsPublisher() -> AnyPublisher<[Product], Error> {
+        return Future { promise in
+            Task {
+                do {
+                    let products = try await self.fetchProducts()
+                    promise(.success(products))
+                } catch {
+                    promise(.failure(error))
+                }
+            }
+        }
+        .receive(on: DispatchQueue.main)
+        .eraseToAnyPublisher()
+    }
+    
+    func fetchProductPublisher(id: String) -> AnyPublisher<Product, Error> {
+        return Future { promise in
+            Task {
+                do {
+                    let product = try await self.fetchProduct(id: id)
+                    promise(.success(product))
+                } catch {
+                    promise(.failure(error))
+                }
+            }
+        }
+        .receive(on: DispatchQueue.main)
+        .eraseToAnyPublisher()
+    }
+    
+    func searchProductsPublisher(query: String) -> AnyPublisher<[Product], Error> {
+        return Future { promise in
+            Task {
+                do {
+                    let products = try await self.searchProducts(query: query)
+                    promise(.success(products))
+                } catch {
+                    promise(.failure(error))
+                }
+            }
+        }
+        .receive(on: DispatchQueue.main)
+        .eraseToAnyPublisher()
     }
     
     // MARK: - Real API Implementation (commented for reference)

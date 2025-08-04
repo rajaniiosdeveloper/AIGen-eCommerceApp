@@ -11,7 +11,6 @@ import Combine
 // MARK: - Product Detail View (VIPER)
 struct ProductDetailView: View {
     let product: Product
-    @EnvironmentObject var store: AppStore
     @StateObject private var presenter = ProductDetailPresenter()
     @Environment(\.dismiss) private var dismiss
     
@@ -158,7 +157,7 @@ struct ProductDetailView: View {
                         // Add to Cart & Wishlist Row
                         HStack(spacing: 12) {
                             Button(action: {
-                                store.addToCart(product: product, quantity: quantity)
+                                presenter.addToCart(product: product, quantity: quantity)
                                 showingAddedToCart = true
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                     showingAddedToCart = false
@@ -178,19 +177,19 @@ struct ProductDetailView: View {
                             .disabled(!product.isInStock)
                             
                             Button(action: {
-                                if store.isInWishlist(productId: product.id) {
-                                    store.removeFromWishlist(productId: product.id)
+                                if presenter.isInWishlist(productId: product.id) {
+                                    presenter.removeFromWishlist(productId: product.id)
                                 } else {
-                                    store.addToWishlist(product: product)
+                                    presenter.addToWishlist(product: product)
                                     showingAddedToWishlist = true
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                         showingAddedToWishlist = false
                                     }
                                 }
                             }) {
-                                Image(systemName: store.isInWishlist(productId: product.id) ? "heart.fill" : "heart")
+                                Image(systemName: presenter.isInWishlist(productId: product.id) ? "heart.fill" : "heart")
                                     .font(.title3)
-                                    .foregroundColor(store.isInWishlist(productId: product.id) ? .red : .gray)
+                                    .foregroundColor(presenter.isInWishlist(productId: product.id) ? .red : .gray)
                                     .frame(width: 50, height: 50)
                                     .background(Color(.systemGray6))
                                     .cornerRadius(12)
@@ -276,25 +275,23 @@ struct ProductDetailView: View {
 
 // MARK: - Product Detail Presenter (VIPER)
 class ProductDetailPresenter: ObservableObject {
-    private let interactor = ProductDetailInteractor()
+    private let cartInteractor = CartInteractor()
+    private let wishlistInteractor = WishlistInteractor()
     
     func addToCart(product: Product, quantity: Int) {
-        interactor.addToCart(product: product, quantity: quantity)
+        cartInteractor.addToCart(product: product, quantity: quantity)
     }
     
     func addToWishlist(product: Product) {
-        interactor.addToWishlist(product: product)
-    }
-}
-
-// MARK: - Product Detail Interactor (VIPER)
-class ProductDetailInteractor {
-    func addToCart(product: Product, quantity: Int) {
-        AppStore.shared.addToCart(product: product, quantity: quantity)
+        wishlistInteractor.addToWishlist(product: product)
     }
     
-    func addToWishlist(product: Product) {
-        AppStore.shared.addToWishlist(product: product)
+    func removeFromWishlist(productId: String) {
+        wishlistInteractor.removeFromWishlist(productId: productId)
+    }
+    
+    func isInWishlist(productId: String) -> Bool {
+        return wishlistInteractor.isInWishlist(productId: productId)
     }
 }
 
@@ -305,6 +302,5 @@ class ProductDetailInteractor {
             product: MockData.sampleProducts[0],
             onBuyNow: { _ in }
         )
-        .environmentObject(AppStore.shared)
     }
 }

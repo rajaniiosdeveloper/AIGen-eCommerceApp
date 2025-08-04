@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct TopNavigationBarView: View {
-    @EnvironmentObject var store: AppStore
+    @StateObject private var cartDataManager = CartDataManager.shared
+    @StateObject private var wishlistDataManager = WishlistDataManager.shared
     let onCartTap: () -> Void
     let onWishlistTap: () -> Void
     
@@ -31,8 +32,8 @@ struct TopNavigationBarView: View {
                             .font(.title3)
                             .foregroundColor(.primary)
                         
-                        if store.wishlistItemCount > 0 {
-                            Text("\(store.wishlistItemCount)")
+                        if wishlistDataManager.getWishlistItemCount() > 0 {
+                            Text("\(wishlistDataManager.getWishlistItemCount())")
                                 .font(.caption2)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.white)
@@ -51,8 +52,8 @@ struct TopNavigationBarView: View {
                             .font(.title3)
                             .foregroundColor(.primary)
                         
-                        if store.cartItemCount > 0 {
-                            Text("\(store.cartItemCount)")
+                        if cartDataManager.getCartItemCount() > 0 {
+                            Text("\(cartDataManager.getCartItemCount())")
                                 .font(.caption2)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.white)
@@ -78,5 +79,4 @@ struct TopNavigationBarView: View {
         onCartTap: {},
         onWishlistTap: {}
     )
-    .environmentObject(AppStore.shared)
 }

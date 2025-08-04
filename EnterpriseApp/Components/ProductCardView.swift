@@ -10,7 +10,8 @@ import SwiftUI
 struct ProductCardView: View {
     let product: Product
     let onTap: () -> Void
-    @EnvironmentObject var store: AppStore
+    @StateObject private var cartDataManager = CartDataManager.shared
+    @StateObject private var wishlistDataManager = WishlistDataManager.shared
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -71,7 +72,7 @@ struct ProductCardView: View {
                 HStack(spacing: 8) {
                     // Add to Cart Button
                     Button(action: {
-                        store.addToCart(product: product)
+                        cartDataManager.addToCart(product: product)
                     }) {
                         HStack(spacing: 4) {
                             Image(systemName: "cart.badge.plus")
@@ -90,15 +91,15 @@ struct ProductCardView: View {
                     
                     // Wishlist Button
                     Button(action: {
-                        if store.isInWishlist(productId: product.id) {
-                            store.removeFromWishlist(productId: product.id)
+                        if wishlistDataManager.isInWishlist(productId: product.id) {
+                            wishlistDataManager.removeFromWishlist(productId: product.id)
                         } else {
-                            store.addToWishlist(product: product)
+                            wishlistDataManager.addToWishlist(product: product)
                         }
                     }) {
-                        Image(systemName: store.isInWishlist(productId: product.id) ? "heart.fill" : "heart")
+                        Image(systemName: wishlistDataManager.isInWishlist(productId: product.id) ? "heart.fill" : "heart")
                             .font(.caption)
-                            .foregroundColor(store.isInWishlist(productId: product.id) ? .red : .gray)
+                            .foregroundColor(wishlistDataManager.isInWishlist(productId: product.id) ? .red : .gray)
                             .frame(width: 24, height: 24)
                     }
                 }

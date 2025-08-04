@@ -12,7 +12,7 @@ import Combine
 struct PaymentView: View {
     let product: Product?
     let isFromCart: Bool
-    @EnvironmentObject var store: AppStore
+    @StateObject private var cartDataManager = CartDataManager.shared
     @StateObject private var presenter = PaymentPresenter()
     @Environment(\.dismiss) private var dismiss
     
@@ -29,7 +29,7 @@ struct PaymentView: View {
         if let product = product {
             return product.price
         } else if isFromCart {
-            return store.cartTotal
+            return cartDataManager.getCartTotal()
         }
         return 0.0
     }
@@ -38,90 +38,100 @@ struct PaymentView: View {
         return "₹\(String(format: "%.2f", totalAmount))"
     }
     
+    private var orderSummarySection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Order Summary")
+                .font(.title2)
+                .fontWeight(.bold)
+            
+            if let product = product {
+                singleProductView(product)
+            } else if isFromCart {
+                cartItemsView
+            }
+        }
+    }
+    
+    private func singleProductView(_ product: Product) -> some View {
+        HStack(spacing: 12) {
+            AsyncImageView(
+                url: product.imageURL,
+                width: 60,
+                height: 60,
+                contentMode: .fill
+            )
+            .cornerRadius(8)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(product.title)
+                    .font(.headline)
+                    .lineLimit(2)
+                
+                Text(product.formattedPrice)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+            }
+            
+            Spacer()
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
+    }
+    
+    private var cartItemsView: some View {
+        VStack(spacing: 12) {
+            ForEach(Array(cartDataManager.getCartItems().prefix(3)), id: \.id) { cartItem in
+                HStack(spacing: 12) {
+                    AsyncImageView(
+                        url: cartItem.product.imageURL,
+                        width: 50,
+                        height: 50,
+                        contentMode: .fill
+                    )
+                    .cornerRadius(8)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(cartItem.product.title)
+                            .font(.subheadline)
+                            .lineLimit(1)
+                        
+                        HStack {
+                            Text("Qty: \(cartItem.quantity)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            
+                            Spacer()
+                            
+                            Text(cartItem.formattedTotalPrice)
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                        }
+                    }
+                    
+                    Spacer()
+                }
+            }
+            
+            if cartDataManager.getCartItems().count > 3 {
+                Text("... and \(cartDataManager.getCartItems().count - 3) more items")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.top, 4)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
+    }
+    
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 24) {
                     // Order Summary
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Order Summary")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                        
-                        if let product = product {
-                            // Single Product Purchase
-                            HStack(spacing: 12) {
-                                AsyncImageView(
-                                    url: product.imageURL,
-                                    width: 60,
-                                    height: 60,
-                                    contentMode: .fill
-                                )
-                                .cornerRadius(8)
-                                
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(product.title)
-                                        .font(.headline)
-                                        .lineLimit(2)
-                                    
-                                    Text(product.formattedPrice)
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.primary)
-                                }
-                                
-                                Spacer()
-                            }
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
-                        } else if isFromCart {
-                            // Cart Items Summary
-                            VStack(spacing: 12) {
-                                ForEach(store.cartItems.prefix(3), id: \.id) { cartItem in
-                                    HStack(spacing: 12) {
-                                        AsyncImageView(
-                                            url: cartItem.productImageURL ?? "",
-                                            width: 50,
-                                            height: 50,
-                                            contentMode: .fill
-                                        )
-                                        .cornerRadius(8)
-                                        
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(cartItem.productTitle ?? "")
-                                                .font(.subheadline)
-                                                .lineLimit(1)
-                                            
-                                            HStack {
-                                                Text("Qty: \(cartItem.quantity)")
-                                                    .font(.caption)
-                                                    .foregroundColor(.secondary)
-                                                
-                                                Spacer()
-                                                
-                                                Text(cartItem.formattedTotalPrice)
-                                                    .font(.caption)
-                                                    .fontWeight(.semibold)
-                                            }
-                                        }
-                                        
-                                        Spacer()
-                                    }
-                                }
-                                
-                                if store.cartItems.count > 3 {
-                                    Text("... and \(store.cartItems.count - 3) more items")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                        .padding(.top, 4)
-                                }
-                            }
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
-                        }
-                    }
+                    orderSummarySection
                     
                     // Payment Method Selection
                     VStack(alignment: .leading, spacing: 16) {
@@ -201,7 +211,7 @@ struct PaymentView: View {
                 paymentMethod: selectedPaymentMethod.displayName
             ) {
                 if isFromCart {
-                    store.clearCart()
+                                            cartDataManager.clearCart()
                 }
                 dismiss()
             }
@@ -387,5 +397,4 @@ class PaymentInteractor {
 // MARK: - Preview
 #Preview {
     PaymentView(product: MockData.sampleProducts[0])
-        .environmentObject(AppStore.shared)
 }

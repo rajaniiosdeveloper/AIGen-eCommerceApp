@@ -10,7 +10,6 @@ import Combine
 
 // MARK: - Home View (VIPER)
 struct HomeView: View {
-    @EnvironmentObject var store: AppStore
     @StateObject private var presenter = HomePresenter()
     
     let onProductTap: (Product) -> Void
@@ -35,12 +34,12 @@ struct HomeView: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.gray)
                 
-                TextField("Search products...", text: $store.searchText)
+                TextField("Search products...", text: $presenter.searchText)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                 
-                if !store.searchText.isEmpty {
+                if !presenter.searchText.isEmpty {
                     Button("Clear") {
-                        store.searchText = ""
+                        presenter.searchText = ""
                     }
                     .foregroundColor(.blue)
                 }
@@ -51,7 +50,7 @@ struct HomeView: View {
             // Content
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(store.filteredProducts) { product in
+                    ForEach(presenter.filteredProducts) { product in
                         ProductCardView(product: product) {
                             onProductTap(product)
                         }
@@ -61,54 +60,39 @@ struct HomeView: View {
                 .padding(.top, 8)
             }
             .refreshable {
-                store.fetchProducts()
+                presenter.fetchProducts()
             }
         }
         .background(Color(.systemGroupedBackground))
         .overlay(
             Group {
-                if store.isLoading && store.products.isEmpty {
+                if presenter.isLoading && presenter.products.isEmpty {
                     ProgressView("Loading products...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color(.systemBackground))
                 }
             }
         )
-        .alert("Error", isPresented: .constant(store.errorMessage != nil)) {
+        .alert("Error", isPresented: .constant(presenter.errorMessage != nil)) {
             Button("OK") {
-                store.clearError()
+                presenter.clearError()
             }
             Button("Retry") {
-                store.fetchProducts()
+                presenter.fetchProducts()
             }
         } message: {
-            Text(store.errorMessage ?? "")
+            Text(presenter.errorMessage ?? "")
         }
         .onAppear {
-            if store.products.isEmpty {
-                store.fetchProducts()
+            if presenter.products.isEmpty {
+                presenter.fetchProducts()
             }
         }
     }
 }
 
-// MARK: - Home Presenter (VIPER)
-class HomePresenter: ObservableObject {
-    private let interactor = HomeInteractor()
-    
-    func fetchProducts() {
-        interactor.fetchProducts()
-    }
-}
-
-// MARK: - Home Interactor (VIPER)
-class HomeInteractor {
-    private let networkService: NetworkServiceProtocol = NetworkService.shared
-    
-    func fetchProducts() {
-        AppStore.shared.fetchProducts()
-    }
-}
+// MARK: - Legacy components (will be removed)
+// The new HomePresenter and HomeInteractor are now in separate files
 
 // MARK: - Preview
 #Preview {
@@ -117,5 +101,4 @@ class HomeInteractor {
         onCartTap: {},
         onWishlistTap: {}
     )
-    .environmentObject(AppStore.shared)
 }
