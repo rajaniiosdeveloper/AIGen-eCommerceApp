@@ -12,6 +12,8 @@ import Combine
 protocol HomeInteractorProtocol {
     func fetchProducts() async throws -> [Product]
     func searchProducts(query: String) async throws -> [Product]
+    func fetchCategories() async throws -> [Category]
+    func fetchProductsByCategory(categoryId: String) async throws -> [Product]
 }
 
 // MARK: - Home Interactor Implementation
@@ -28,5 +30,13 @@ class HomeInteractor: HomeInteractorProtocol {
     
     func searchProducts(query: String) async throws -> [Product] {
         return try await networkService.searchProducts(query: query)
+    }
+    
+    func fetchCategories() async throws -> [Category] {
+        return try await networkService.fetchCategories()
+    }
+    
+    func fetchProductsByCategory(categoryId: String) async throws -> [Product] {
+        return try await networkService.fetchProductsByCategory(categoryId: categoryId)
     }
 }

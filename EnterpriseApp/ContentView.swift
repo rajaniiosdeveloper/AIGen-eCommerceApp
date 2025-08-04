@@ -9,8 +9,21 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var router = AppRouter()
+    @StateObject private var authManager = AuthenticationManager.shared
     
     var body: some View {
+        Group {
+            if authManager.isAuthenticated {
+                mainAppView
+            } else {
+                SignInView {
+                    // Navigation handled by AuthenticationManager state change
+                }
+            }
+        }
+    }
+    
+    private var mainAppView: some View {
         NavigationView {
             HomeView(
                 onProductTap: { product in
@@ -21,6 +34,9 @@ struct ContentView: View {
                 },
                 onWishlistTap: {
                     router.navigateToWishlist()
+                },
+                onMenuTap: {
+                    router.navigateToMenu()
                 }
             )
             .environmentObject(router)
@@ -61,6 +77,35 @@ struct ContentView: View {
                 product: router.paymentProduct,
                 isFromCart: router.isPaymentFromCart
             )
+        }
+        .sheet(isPresented: $router.showingMenu) {
+            MenuView(
+                onOrderHistoryTap: {
+                    router.showingMenu = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        router.navigateToOrderHistory()
+                    }
+                },
+                onSignOutTap: {
+                    router.showingMenu = false
+                    authManager.signOut()
+                }
+            )
+        }
+        .sheet(isPresented: $router.showingOrderHistory) {
+            OrderHistoryView(
+                onOrderTap: { order in
+                    router.showingOrderHistory = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        router.navigateToOrderDetail(order)
+                    }
+                }
+            )
+        }
+        .sheet(isPresented: $router.showingOrderDetail) {
+            if let order = router.selectedOrder {
+                OrderDetailView(order: order)
+            }
         }
     }
 }

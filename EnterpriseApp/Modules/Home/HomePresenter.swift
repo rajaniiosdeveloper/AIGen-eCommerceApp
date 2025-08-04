@@ -12,12 +12,16 @@ import Combine
 protocol HomePresenterProtocol: ObservableObject {
     var products: [Product] { get }
     var filteredProducts: [Product] { get }
+    var categories: [Category] { get }
+    var selectedCategory: Category? { get set }
     var isLoading: Bool { get }
     var errorMessage: String? { get }
     var searchText: String { get set }
     
     func fetchProducts()
+    func fetchCategories()
     func searchProducts()
+    func selectCategory(_ category: Category?)
     func clearError()
 }
 
@@ -25,6 +29,12 @@ protocol HomePresenterProtocol: ObservableObject {
 @MainActor
 class HomePresenter: HomePresenterProtocol {
     @Published var products: [Product] = []
+    @Published var categories: [Category] = []
+    @Published var selectedCategory: Category? = nil {
+        didSet {
+            fetchProductsByCategory()
+        }
+    }
     @Published var isLoading = false
     @Published var errorMessage: String? = nil
     @Published var searchText = "" {
@@ -34,15 +44,23 @@ class HomePresenter: HomePresenterProtocol {
     }
     
     var filteredProducts: [Product] {
-        if searchText.isEmpty {
-            return products
-        } else {
-            return products.filter { product in
+        var filtered = products
+        
+        // Filter by category if selected
+        if let selectedCategory = selectedCategory {
+            filtered = filtered.filter { $0.category == selectedCategory.name }
+        }
+        
+        // Filter by search text
+        if !searchText.isEmpty {
+            filtered = filtered.filter { product in
                 product.title.localizedCaseInsensitiveContains(searchText) ||
                 product.description.localizedCaseInsensitiveContains(searchText) ||
                 product.category.localizedCaseInsensitiveContains(searchText)
             }
         }
+        
+        return filtered
     }
     
     private let interactor: HomeInteractorProtocol
@@ -79,6 +97,42 @@ class HomePresenter: HomePresenterProtocol {
             } catch {
                 self.errorMessage = error.localizedDescription
             }
+        }
+    }
+    
+    func fetchCategories() {
+        Task {
+            do {
+                let fetchedCategories = try await interactor.fetchCategories()
+                self.categories = fetchedCategories
+            } catch {
+                self.errorMessage = error.localizedDescription
+            }
+        }
+    }
+    
+    func selectCategory(_ category: Category?) {
+        selectedCategory = category
+    }
+    
+    private func fetchProductsByCategory() {
+        guard let selectedCategory = selectedCategory else {
+            fetchProducts()
+            return
+        }
+        
+        Task {
+            isLoading = true
+            errorMessage = nil
+            
+            do {
+                let fetchedProducts = try await interactor.fetchProductsByCategory(categoryId: selectedCategory.id)
+                self.products = fetchedProducts
+            } catch {
+                self.errorMessage = error.localizedDescription
+            }
+            
+            isLoading = false
         }
     }
     

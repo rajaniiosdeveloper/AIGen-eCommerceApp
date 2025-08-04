@@ -10,11 +10,19 @@ import SwiftUI
 struct TopNavigationBarView: View {
     @StateObject private var cartDataManager = CartDataManager.shared
     @StateObject private var wishlistDataManager = WishlistDataManager.shared
+    let onMenuTap: () -> Void
     let onCartTap: () -> Void
     let onWishlistTap: () -> Void
     
     var body: some View {
         HStack {
+            // Menu Button
+            Button(action: onMenuTap) {
+                Image(systemName: "line.3.horizontal")
+                    .font(.title3)
+                    .foregroundColor(.primary)
+            }
+            
             // App Title
             Text("ShopEasy")
                 .font(.title2)
@@ -76,6 +84,7 @@ struct TopNavigationBarView: View {
 // MARK: - Preview
 #Preview {
     TopNavigationBarView(
+        onMenuTap: {},
         onCartTap: {},
         onWishlistTap: {}
     )

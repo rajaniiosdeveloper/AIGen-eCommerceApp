@@ -15,6 +15,7 @@ struct HomeView: View {
     let onProductTap: (Product) -> Void
     let onCartTap: () -> Void
     let onWishlistTap: () -> Void
+    let onMenuTap: () -> Void
     
     // Removed grid columns - using list view now
     
@@ -22,9 +23,22 @@ struct HomeView: View {
         VStack(spacing: 0) {
             // Top Navigation Bar
             TopNavigationBarView(
+                onMenuTap: onMenuTap,
                 onCartTap: onCartTap,
                 onWishlistTap: onWishlistTap
             )
+            
+            // Category Selector
+            if !presenter.categories.isEmpty {
+                CategorySelectorView(
+                    categories: presenter.categories,
+                    selectedCategory: $presenter.selectedCategory,
+                    onCategorySelected: { category in
+                        presenter.selectCategory(category)
+                    }
+                )
+                .padding(.vertical, 8)
+            }
             
             // Search Bar
             HStack {
@@ -84,6 +98,9 @@ struct HomeView: View {
         .onAppear {
             if presenter.products.isEmpty {
                 presenter.fetchProducts()
+            }
+            if presenter.categories.isEmpty {
+                presenter.fetchCategories()
             }
         }
     }
@@ -191,6 +208,7 @@ struct ProductListRowView: View {
     HomeView(
         onProductTap: { _ in },
         onCartTap: {},
-        onWishlistTap: {}
+        onWishlistTap: {},
+        onMenuTap: {}
     )
 }
