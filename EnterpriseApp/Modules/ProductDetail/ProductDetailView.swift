@@ -31,7 +31,8 @@ struct ProductDetailView: View {
                     contentMode: .fill
                 )
                 .cornerRadius(16)
-                .padding(.horizontal)
+                .padding(.horizontal, 20)
+                .padding(.top, 10)
                 
                 VStack(alignment: .leading, spacing: 16) {
                     // Product Info
@@ -108,46 +109,52 @@ struct ProductDetailView: View {
                                 .font(.headline)
                                 .fontWeight(.semibold)
                             
-                            HStack {
-                                Button(action: {
-                                    if quantity > 1 {
-                                        quantity -= 1
+                            HStack(spacing: 12) {
+                                // Quantity controls
+                                HStack(spacing: 8) {
+                                    Button(action: {
+                                        if quantity > 1 {
+                                            quantity -= 1
+                                        }
+                                    }) {
+                                        Image(systemName: "minus")
+                                            .font(.title3)
+                                            .foregroundColor(.primary)
+                                            .frame(width: 44, height: 44)
+                                            .background(Color(.systemGray5))
+                                            .cornerRadius(8)
                                     }
-                                }) {
-                                    Image(systemName: "minus")
+                                    .disabled(quantity <= 1)
+                                    
+                                    Text("\(quantity)")
                                         .font(.title3)
-                                        .foregroundColor(.primary)
-                                        .frame(width: 44, height: 44)
-                                        .background(Color(.systemGray5))
-                                        .cornerRadius(8)
-                                }
-                                .disabled(quantity <= 1)
-                                
-                                Text("\(quantity)")
-                                    .font(.title3)
-                                    .fontWeight(.semibold)
-                                    .frame(minWidth: 40)
-                                
-                                Button(action: {
-                                    if quantity < product.stock {
-                                        quantity += 1
+                                        .fontWeight(.semibold)
+                                        .frame(minWidth: 40)
+                                    
+                                    Button(action: {
+                                        if quantity < product.stock {
+                                            quantity += 1
+                                        }
+                                    }) {
+                                        Image(systemName: "plus")
+                                            .font(.title3)
+                                            .foregroundColor(.primary)
+                                            .frame(width: 44, height: 44)
+                                            .background(Color(.systemGray5))
+                                            .cornerRadius(8)
                                     }
-                                }) {
-                                    Image(systemName: "plus")
-                                        .font(.title3)
-                                        .foregroundColor(.primary)
-                                        .frame(width: 44, height: 44)
-                                        .background(Color(.systemGray5))
-                                        .cornerRadius(8)
+                                    .disabled(quantity >= product.stock)
                                 }
-                                .disabled(quantity >= product.stock)
                                 
                                 Spacer()
                                 
+                                // Total price - ensure it doesn't get cut off
                                 Text("₹\(String(format: "%.2f", product.price * Double(quantity)))")
                                     .font(.title3)
                                     .fontWeight(.bold)
                                     .foregroundColor(.primary)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
                             }
                         }
                     }
@@ -163,14 +170,17 @@ struct ProductDetailView: View {
                                     showingAddedToCart = false
                                 }
                             }) {
-                                HStack {
+                                HStack(spacing: 8) {
                                     Image(systemName: "cart.badge.plus")
+                                        .font(.system(size: 16, weight: .medium))
                                     Text("Add to Cart")
                                         .fontWeight(.semibold)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.8)
                                 }
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
+                                .frame(height: 50)
                                 .background(product.isInStock ? Color.blue : Color.gray)
                                 .cornerRadius(12)
                             }
@@ -188,7 +198,7 @@ struct ProductDetailView: View {
                                 }
                             }) {
                                 Image(systemName: presenter.isInWishlist(productId: product.id) ? "heart.fill" : "heart")
-                                    .font(.title3)
+                                    .font(.system(size: 18, weight: .medium))
                                     .foregroundColor(presenter.isInWishlist(productId: product.id) ? .red : .gray)
                                     .frame(width: 50, height: 50)
                                     .background(Color(.systemGray6))
@@ -200,23 +210,30 @@ struct ProductDetailView: View {
                         Button(action: {
                             onBuyNow(product)
                         }) {
-                            HStack {
+                            HStack(spacing: 8) {
                                 Image(systemName: "creditcard")
+                                    .font(.system(size: 16, weight: .medium))
                                 Text("Buy Now")
                                     .fontWeight(.bold)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
                             }
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
+                            .frame(height: 54)
                             .background(product.isInStock ? Color.green : Color.gray)
                             .cornerRadius(12)
                         }
                         .disabled(!product.isInStock)
                     }
+                    .padding(.top, 8)
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 20)
             }
+            .padding(.bottom, 20) // Add bottom padding for better spacing
         }
+        .background(Color(.systemGroupedBackground))
+        .ignoresSafeArea(edges: .bottom) // Allow content to extend to bottom while maintaining safe areas
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -240,11 +257,13 @@ struct ProductDetailView: View {
                             Text("Added to Cart!")
                                 .fontWeight(.semibold)
                         }
-                        .padding()
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
                         .background(Color(.systemBackground))
                         .cornerRadius(12)
-                        .shadow(radius: 8)
-                        .padding(.bottom, 100)
+                        .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 2)
+                        .padding(.horizontal, 20) // Ensure toast doesn't touch screen edges
+                        .padding(.bottom, 120) // Safe distance from bottom
                     }
                     .transition(.move(edge: .bottom))
                     .animation(.spring(), value: showingAddedToCart)
@@ -259,11 +278,13 @@ struct ProductDetailView: View {
                             Text("Added to Wishlist!")
                                 .fontWeight(.semibold)
                         }
-                        .padding()
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
                         .background(Color(.systemBackground))
                         .cornerRadius(12)
-                        .shadow(radius: 8)
-                        .padding(.bottom, 100)
+                        .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 2)
+                        .padding(.horizontal, 20) // Ensure toast doesn't touch screen edges
+                        .padding(.bottom, 120) // Safe distance from bottom
                     }
                     .transition(.move(edge: .bottom))
                     .animation(.spring(), value: showingAddedToWishlist)
