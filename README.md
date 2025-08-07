@@ -11,78 +11,78 @@ This project was generated using **Cursor-AI**, an AI-powered code editor that h
 - **AI Prompt Used**: 
   ```
   Features Required:
-Homepage / List View:
+  Homepage / List View:
 
-Display a list of items.
+  Display a list of items.
 
-Each item must include:
+  Each item must include:
 
-Image
+  Image
 
-Title
+  Title
 
-Description
+  Description
 
-Price
+  Price
 
-Clicking on an item should open the Item Detail Page.
+  Clicking on an item should open the Item Detail Page.
 
-Item Detail Page:
+  Item Detail Page:
 
-Show full item details: image, title, description, price.
+  Show full item details: image, title, description, price.
 
-Include 3 buttons:
+  Include 3 buttons:
 
-Add to Cart
+  Add to Cart
 
-Add to Wishlist
+  Add to Wishlist
 
-Buy Now
+  Buy Now
 
-Add to Wishlist:
+  Add to Wishlist:
 
-When clicked, add the item to the user’s Wishlist.
+  When clicked, add the item to the user's Wishlist.
 
-Create a dedicated Wishlist Page that shows all saved items in a table view with columns: Image, Title, Price.
+  Create a dedicated Wishlist Page that shows all saved items in a table view with columns: Image, Title, Price.
 
-Add to Cart:
+  Add to Cart:
 
-When clicked, add the item to the user’s Cart.
+  When clicked, add the item to the user's Cart.
 
-Create a Cart Page showing all added items in list view with:
+  Create a Cart Page showing all added items in list view with:
 
-Image, Title, Price per item
+  Image, Title, Price per item
 
-Total items
+  Total items
 
-Final total price in rupees
+  Final total price in rupees
 
-Buy Now:
+  Buy Now:
 
-Redirect to a Payment Page
+  Redirect to a Payment Page
 
-Display the selected item's title, price, and description
+  Display the selected item's title, price, and description
 
-Include a simple payment placeholder (no real payment integration needed)
+  Include a simple payment placeholder (no real payment integration needed)
 
-Header (Top Navigation Bar on All Pages):
+  Header (Top Navigation Bar on All Pages):
 
-Include icons for:
+  Include icons for:
 
-Cart (clicking opens Cart Page)
+  Cart (clicking opens Cart Page)
 
-Wishlist (clicking opens Wishlist Page)
+  Wishlist (clicking opens Wishlist Page)
 
-Icons should show badge with count of items
+  Icons should show badge with count of items
 
-Additional Notes:
-Use modern UI components (e.g. Tailwind CSS, Material UI, or Bootstrap)
+  Additional Notes:
+  Use modern UI components (e.g. Tailwind CSS, Material UI, or Bootstrap)
 
-Use state management for cart and wishlist (e.g. Redux, Context API, or Zustand)
+  Use state management for cart and wishlist (e.g. Redux, Context API, or Zustand)
 
-Backend can be mocked or use a JSON file/local storage or simple Express.js API
+  Backend can be mocked or use a JSON file/local storage or simple Express.js API
 
-Use React or Next.js for frontend if appropriate
+  Use React or Next.js for frontend if appropriate
   ```
 
 ## 📱 Project Overview
@@ -316,10 +316,15 @@ This section documents all the prompts and requests made during the AI-assisted 
     "Please add all prompts in the read.me file whatever i have given today to you for this project for documentation"
     ```
 
+12. **HLD and DFD Request**:
+    ```
+    "i need HLD and DFD of current project"
+    ```
+
 ---
 
 ### **Development Session Summary**
-- **Total Prompts**: 11 unique development requests
+- **Total Prompts**: 12 unique development requests
 - **Major Features Implemented**: 
   - Complete Core Data → API migration
   - Authentication system with sign-in/register
@@ -327,429 +332,616 @@ This section documents all the prompts and requests made during the AI-assisted 
   - Order history and order detail screens
   - Product categories with filtering
   - UI layout fixes and responsive design
+  - Comprehensive technical documentation
 - **Architecture**: Maintained VIPER pattern throughout
 - **Build Status**: ✅ Successful compilation
 - **Repository**: All changes committed and pushed
 
 ---
 
-*This project demonstrates the power of AI-assisted development using Cursor-AI to rapidly prototype and build comprehensive iOS applications.*
-
-
-
-
-
-I'll create a High-Level Design (HLD) and Data Flow Diagram (DFD) for your current iOS eCommerce project. Let me analyze the project structure first and then create comprehensive diagrams.
-Search files...
-Read file: EnterpriseApp/Models/Product.swift
-Read file: EnterpriseApp/Models/Product.swift
-Read file: EnterpriseApp/Network/NetworkService.swift
-Now I'll create comprehensive HLD and DFD diagrams based on the project analysis. Let me create these as markdown content in the README file.
-Read file: README.md
-Ran tool
-I'll append the HLD and DFD content to the README file:
-Read file: README.md
-Let me create a new markdown file with the HLD and DFD content since I cannot use the search_replace tool:
-Ran tool
-Let me create a separate file for the HLD and DFD documentation:
-Ran tool
-I'll create a comprehensive HLD and DFD document. Since I cannot modify files directly, let me provide you with the complete High-Level Design and Data Flow Diagrams for your iOS eCommerce project:
-
-## 🏛️ **High-Level Design (HLD) & Data Flow Diagram (DFD)**
+## 🏛️ High-Level Design (HLD) & Data Flow Diagram (DFD)
 
 ### **System Architecture Overview**
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           iOS eCommerce Application                          │
-│                              (VIPER Architecture)                            │
-└─────────────────────────────────────────────────────────────────────────────┘
+#### **VIPER Architecture Layers**
 
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              PRESENTATION LAYER                             │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │   SignIn    │  │     Home    │  │ ProductDet. │  │    Cart     │          │
-│  │    View     │  │    View     │  │    View     │  │    View     │          │
-│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘          │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │  Wishlist   │  │   Payment   │  │    Menu     │  │ OrderHistory│          │
-│  │    View     │  │    View     │  │    View     │  │    View     │          │
-│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘          │
-│                                                                               │
-│  ┌─────────────────────────────────────────────────────────────────────────┐ │
-│  │                        Common UI Components                              │ │
-│  │  • TopNavigationBar  • ProductCard  • CategorySelector                  │ │
-│  │  • AsyncImageView    • ProductListRow • Loading/Error States            │ │
-│  └─────────────────────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              BUSINESS LAYER                                 │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │   SignIn    │  │     Home    │  │ ProductDet. │  │    Cart     │          │
-│  │  Presenter  │  │  Presenter  │  │  Presenter  │  │  Presenter  │          │
-│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘          │
-│  ┌─────────────┐  ┌─────────────┐                  ┌─────────────┐          │
-│  │  Wishlist   │  │   Payment   │                  │ OrderHistory│          │
-│  │  Presenter  │  │  Presenter  │                  │  Presenter  │          │
-│  └─────────────┘  └─────────────┘                  └─────────────┘          │
-│                                                                               │
-│  ┌─────────────────────────────────────────────────────────────────────────┐ │
-│  │                           App Router                                     │ │
-│  │  • Navigation Management • Sheet Presentation • State Coordination      │ │
-│  └─────────────────────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                               DATA LAYER                                    │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │   SignIn    │  │     Home    │  │    Cart     │  │  Wishlist   │          │
-│  │ Interactor  │  │ Interactor  │  │ Interactor  │  │ Interactor  │          │
-│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘          │
-│  ┌─────────────┐  ┌─────────────┐                                            │
-│  │   Payment   │  │ OrderHistory│                                            │
-│  │ Interactor  │  │ Interactor  │                                            │
-│  └─────────────┘  └─────────────┘                                            │
-│                                                                               │
-│  ┌─────────────────────────────────────────────────────────────────────────┐ │
-│  │                         Data Managers                                   │ │
-│  │  • AuthenticationManager  • CartDataManager  • WishlistDataManager      │ │
-│  └─────────────────────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              NETWORK LAYER                                  │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  ┌─────────────────────────────────────────────────────────────────────────┐ │
-│  │                         Network Service                                 │ │
-│  │  • URLSession + async/await  • RESTful API Integration                  │ │
-│  │  • Error Handling           • Response Parsing                         │ │
-│  └─────────────────────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                             STORAGE LAYER                                   │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                           │
-│  │ UserDefaults│  │ In-Memory   │  │  Remote API │                           │
-│  │ (Auth Token)│  │ Cart/Wishlist│  │  (Products, │                           │
-│  │             │  │   Storage   │  │Orders, etc.)│                           │
-│  └─────────────┘  └─────────────┘  └─────────────┘                           │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph "Presentation Layer"
+        A[SignIn View] 
+        B[Home View]
+        C[Product Detail View]
+        D[Cart View]
+        E[Wishlist View]
+        F[Payment View]
+        G[Menu View]
+        H[Order History View]
+        I[Order Detail View]
+    end
+    
+    subgraph "Business Layer"
+        J[SignIn Presenter]
+        K[Home Presenter]
+        L[Product Detail Presenter]
+        M[Cart Presenter]
+        N[Wishlist Presenter]
+        O[Payment Presenter]
+        P[Order History Presenter]
+        Q[App Router]
+    end
+    
+    subgraph "Data Layer"
+        R[SignIn Interactor]
+        S[Home Interactor]
+        T[Cart Interactor]
+        U[Wishlist Interactor]
+        V[Payment Interactor]
+        W[Order History Interactor]
+        X[Network Service]
+    end
+    
+    subgraph "Storage Layer"
+        Y[UserDefaults<br/>Auth Token]
+        Z[In-Memory Storage<br/>Cart/Wishlist]
+        AA[Remote API<br/>Products/Orders]
+    end
+    
+    A --> J
+    B --> K
+    C --> L
+    D --> M
+    E --> N
+    F --> O
+    G --> Q
+    H --> P
+    I --> Q
+    
+    J --> R
+    K --> S
+    L --> S
+    M --> T
+    N --> U
+    O --> V
+    P --> W
+    
+    R --> X
+    S --> X
+    T --> Z
+    U --> Z
+    V --> X
+    W --> X
+    
+    X --> AA
+    R --> Y
+    Q -.-> A
+    Q -.-> B
+    Q -.-> C
+    Q -.-> D
+    Q -.-> E
+    Q -.-> F
+    Q -.-> G
+    Q -.-> H
+    Q -.-> I
 ```
 
 ### **Data Flow Diagram (DFD) - Level 0 (Context Diagram)**
 
-```
-                    ┌─────────────────────────────────────┐
-                    │                                     │
-                    │           iOS User                  │
-                    │                                     │
-                    └─────────────┬───────────────────────┘
-                                  │
-                                  │ User Interactions
-                                  │ (Tap, Swipe, Input)
-                                  │
-                                  ▼
-                    ┌─────────────────────────────────────┐
-                    │                                     │
-        API Data    │      eCommerce iOS App              │     API Requests
-     ◄──────────────┤        (VIPER + SwiftUI)            ├─────────────────►
-                    │                                     │
-                    └─────────────┬───────────────────────┘
-                                  │
-                                  │ Local Storage
-                                  │ (Auth, Cart, Wishlist)
-                                  │
-                                  ▼
-                    ┌─────────────────────────────────────┐
-                    │                                     │
-                    │      Device Storage                 │
-                    │   (UserDefaults + Memory)           │
-                    │                                     │
-                    └─────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph External
+        A[iOS User]
+        B[Remote API Server]
+        C[Device Storage]
+    end
+    
+    subgraph System
+        D[eCommerce iOS App<br/>VIPER + SwiftUI]
+    end
+    
+    A -->|User Interactions<br/>Tap, Swipe, Input| D
+    D -->|UI Updates<br/>Visual Feedback| A
+    D -->|API Requests<br/>GET/POST Data| B
+    B -->|API Responses<br/>JSON Data| D
+    D -->|Store Auth Token<br/>Cart/Wishlist State| C
+    C -->|Retrieve Stored Data<br/>Session Persistence| D
 ```
 
 ### **Data Flow Diagram (DFD) - Level 1 (System Overview)**
 
-```
-┌──────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌──────────────┐
-│              │    │                 │    │                 │    │              │
-│     User     ├───►│ Authentication  ├───►│   App Router    ├───►│  Navigation  │
-│              │    │     System      │    │                 │    │   Manager    │
-└──────────────┘    └─────────────────┘    └─────────────────┘    └──────────────┘
-                             │                        │
-                             │                        │
-                             ▼                        ▼
-                    ┌─────────────────┐    ┌─────────────────┐
-                    │                 │    │                 │
-                    │ Session Storage ├───►│ Screen Modules  │
-                    │ (UserDefaults)  │    │ (VIPER Pattern) │
-                    │                 │    │                 │
-                    └─────────────────┘    └─────────┬───────┘
-                                                     │
-                                                     │
-                                                     ▼
-┌──────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌──────────────┐
-│              │    │                 │    │                 │    │              │
-│  Remote API  │◄───┤  Network Layer  │◄───┤   Interactors   ├───►│ Data Managers│
-│   (Backend)  │    │ (URLSession +   │    │ (Business Logic)│    │(Cart/Wishlist│
-│              │    │  async/await)   │    │                 │    │  In-Memory)  │
-└──────────────┘    └─────────────────┘    └─────────────────┘    └──────────────┘
-                             │                        │                     │
-                             │                        │                     │
-                             ▼                        ▼                     ▼
-                    ┌─────────────────┐    ┌─────────────────┐    ┌──────────────┐
-                    │                 │    │                 │    │              │
-                    │   Presenters    │◄───┤     Models      ├───►│     Views    │
-                    │ (Format Data +  │    │(Product, User,  │    │   (SwiftUI   │
-                    │  UI Logic)      │    │Order, Category) │    │  Interface)  │
-                    │                 │    │                 │    │              │
-                    └─────────────────┘    └─────────────────┘    └──────────────┘
+```mermaid
+flowchart TD
+    subgraph "User Interface Layer"
+        A[User Input]
+        B[SwiftUI Views]
+    end
+    
+    subgraph "Application Layer"
+        C[App Router]
+        D[Authentication Manager]
+        E[VIPER Modules]
+    end
+    
+    subgraph "Business Logic Layer"
+        F[Presenters]
+        G[Interactors]
+        H[Data Managers]
+    end
+    
+    subgraph "Data Access Layer"
+        I[Network Service]
+        J[UserDefaults]
+        K[In-Memory Storage]
+    end
+    
+    subgraph "External Systems"
+        L[Remote API]
+        M[Device Storage]
+    end
+    
+    A --> B
+    B --> C
+    C --> D
+    C --> E
+    E --> F
+    F --> G
+    G --> H
+    G --> I
+    I --> L
+    H --> K
+    D --> J
+    J --> M
+    K --> M
+    
+    L --> I
+    I --> G
+    G --> F
+    F --> E
+    E --> C
+    C --> B
+    B --> A
 ```
 
-### **Detailed Module Data Flow**
+### **Detailed Module Data Flows**
 
 #### **1. Authentication Flow**
-```
-User Input (Email/Password)
-        │
-        ▼
-SignInView → SignInPresenter → SignInInteractor → NetworkService
-        │                                                │
-        ▼                                                ▼
-AuthenticationManager ←─────────────────── API Response (User + Token)
-        │
-        ▼
-UserDefaults (Token Storage) + Published State Change
-        │
-        ▼
-ContentView (Conditional Navigation to Home)
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant SV as SignInView
+    participant SP as SignInPresenter
+    participant SI as SignInInteractor
+    participant NS as NetworkService
+    participant AM as AuthenticationManager
+    participant UD as UserDefaults
+    participant CV as ContentView
+    
+    U->>SV: Enter Email/Password
+    SV->>SP: signIn(email, password)
+    SP->>SI: signIn(email, password)
+    SI->>NS: signIn(email, password)
+    NS->>NS: API Call to /auth/signin
+    NS-->>SI: AuthResponse (User + Token)
+    SI->>AM: saveSession(user, token)
+    AM->>UD: Store auth token
+    AM->>AM: Set isAuthenticated = true
+    AM-->>CV: @Published state change
+    CV->>CV: Navigate to HomeView
 ```
 
 #### **2. Product Browsing Flow**
-```
-HomeView (onAppear)
-        │
-        ▼
-HomePresenter → HomeInteractor → NetworkService → Remote API
-        │                                              │
-        ▼                                              ▼
-Category Selector ←────────── Products by Category ────┘
-        │
-        ▼
-ProductList (Filtered Display)
-        │
-        ▼
-ProductDetail (on Product Tap)
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant HV as HomeView
+    participant HP as HomePresenter
+    participant HI as HomeInteractor
+    participant NS as NetworkService
+    participant API as Remote API
+    
+    U->>HV: App Launch / onAppear
+    HV->>HP: fetchProducts()
+    HP->>HI: fetchProducts()
+    HI->>NS: fetchProducts()
+    NS->>API: GET /products
+    API-->>NS: Product List JSON
+    NS-->>HI: [Product]
+    HI-->>HP: [Product]
+    HP->>HP: Update @Published products
+    HP-->>HV: UI Auto-Update
+    HV-->>U: Display Product List
+    
+    U->>HV: Select Category
+    HV->>HP: selectCategory(category)
+    HP->>HI: fetchProductsByCategory(categoryId)
+    HI->>NS: fetchProductsByCategory(categoryId)
+    NS->>API: GET /categories/{id}/products
+    API-->>NS: Filtered Product List
+    NS-->>HI: [Product]
+    HI-->>HP: [Product]
+    HP-->>HV: Update Product Display
 ```
 
 #### **3. Shopping Cart Flow**
-```
-ProductDetailView (Add to Cart)
-        │
-        ▼
-CartDataManager (In-Memory Storage)
-        │
-        ▼
-@Published cartItems → UI Updates (Badge Counts)
-        │
-        ▼
-CartView → CartPresenter → CartInteractor
-        │
-        ▼
-PaymentView (Checkout) → Order Creation
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant PDV as ProductDetailView
+    participant CDM as CartDataManager
+    participant CV as CartView
+    participant CP as CartPresenter
+    participant PV as PaymentView
+    
+    U->>PDV: Tap "Add to Cart"
+    PDV->>CDM: addToCart(product, quantity)
+    CDM->>CDM: Update @Published cartItems
+    CDM-->>PDV: Cart Badge Update
+    
+    U->>CV: Navigate to Cart
+    CV->>CP: fetchCartItems()
+    CP->>CDM: getCartItems()
+    CDM-->>CP: [CartItem]
+    CP-->>CV: Display Cart Items
+    
+    U->>CV: Tap "Checkout"
+    CV->>PV: Navigate to Payment
+    PV->>CDM: getCartItems() + calculateTotal()
+    CDM-->>PV: Cart Summary
+    
+    U->>PV: Complete Payment
+    PV->>CDM: clearCart()
+    CDM->>CDM: Reset @Published cartItems
 ```
 
 #### **4. Order Management Flow**
-```
-MenuView (Order History Tap)
-        │
-        ▼
-OrderHistoryView → OrderHistoryPresenter → OrderHistoryInteractor
-        │                                           │
-        ▼                                           ▼
-User ID (from AuthManager) ────────────────► NetworkService
-        │                                           │
-        ▼                                           ▼
-OrderDetailView ←────────── Order List ────────────┘
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant MV as MenuView
+    participant OHV as OrderHistoryView
+    participant OHP as OrderHistoryPresenter
+    participant OHI as OrderHistoryInteractor
+    participant NS as NetworkService
+    participant AM as AuthenticationManager
+    participant ODV as OrderDetailView
+    
+    U->>MV: Tap "Order History"
+    MV->>OHV: Navigate to Order History
+    OHV->>OHP: fetchOrders()
+    OHP->>OHI: fetchOrders()
+    OHI->>AM: getCurrentUser()
+    AM-->>OHI: User (with userId)
+    OHI->>NS: fetchOrders(userId)
+    NS-->>OHI: [Order]
+    OHI-->>OHP: [Order]
+    OHP-->>OHV: Display Order List
+    
+    U->>OHV: Tap on Order
+    OHV->>ODV: Navigate with selectedOrder
+    ODV->>ODV: Display Order Details
 ```
 
 ### **API Endpoints & Data Models**
 
-#### **Network Service API Structure**
-```
-Authentication APIs:
-├── POST /auth/signin      → AuthResponse (User + Token)
-├── POST /auth/register    → AuthResponse (User + Token)
-└── POST /auth/refresh     → AuthResponse (Updated Token)
+#### **RESTful API Structure**
 
-Product APIs:
-├── GET  /products         → [Product]
-├── GET  /products/{id}    → Product
-├── GET  /products/search  → [Product] (by query)
-└── GET  /categories/{id}/products → [Product] (by category)
-
-Category APIs:
-└── GET  /categories       → [Category]
-
-Order APIs:
-├── GET  /orders/{userId}  → [Order]
-├── GET  /orders/{orderId} → Order
-└── POST /orders           → Order (Create new order)
-```
+| **Category** | **Method** | **Endpoint** | **Request** | **Response** |
+|--------------|------------|--------------|-------------|--------------|
+| **Authentication** | POST | `/auth/signin` | `AuthRequest` | `AuthResponse` |
+| | POST | `/auth/register` | `RegisterRequest` | `AuthResponse` |
+| | POST | `/auth/refresh` | `RefreshToken` | `AuthResponse` |
+| **Products** | GET | `/products` | - | `[Product]` |
+| | GET | `/products/{id}` | - | `Product` |
+| | GET | `/products/search?q={query}` | - | `[Product]` |
+| **Categories** | GET | `/categories` | - | `[Category]` |
+| | GET | `/categories/{id}/products` | - | `[Product]` |
+| **Orders** | GET | `/orders/{userId}` | - | `[Order]` |
+| | GET | `/orders/{orderId}` | - | `Order` |
+| | POST | `/orders` | `CreateOrderRequest` | `Order` |
 
 #### **Core Data Models**
+
+<details>
+<summary><strong>📋 Click to expand Data Model Definitions</strong></summary>
+
+```swift
+// MARK: - User Models
+struct User: Codable {
+    let id: String
+    let name: String
+    let email: String
+}
+
+struct AuthRequest: Codable {
+    let email: String
+    let password: String
+}
+
+struct AuthResponse: Codable {
+    let user: User
+    let token: String
+    let refreshToken: String?
+    let expiresIn: Int
+}
+
+// MARK: - Product Models
+struct Product: Identifiable, Codable {
+    let id: String
+    let title: String
+    let description: String
+    let price: Double
+    let imageURL: String
+    let category: String
+    let rating: Double
+    let stock: Int
+    let brand: String
+}
+
+struct Category: Identifiable, Codable {
+    let id: String
+    let name: String
+    let imageURL: String?
+    let productCount: Int
+}
+
+// MARK: - Cart & Wishlist Models
+struct CartItem: Identifiable, Codable {
+    let id: String
+    let product: Product
+    var quantity: Int
+    let dateAdded: Date
+}
+
+struct WishlistItem: Identifiable, Codable {
+    let id: String
+    let product: Product
+    let dateAdded: Date
+}
+
+// MARK: - Order Models
+struct Order: Identifiable, Codable {
+    let id: String
+    let userId: String
+    let items: [OrderItem]
+    let totalAmount: Double
+    let status: OrderStatus
+    let orderDate: Date
+    let deliveryDate: Date?
+    let shippingAddress: String
+}
+
+struct OrderItem: Identifiable, Codable {
+    let id: String
+    let productId: String
+    let productTitle: String
+    let productImageURL: String
+    let quantity: Int
+    let unitPrice: Double
+    let totalPrice: Double
+}
+
+enum OrderStatus: String, Codable, CaseIterable {
+    case pending = "pending"
+    case confirmed = "confirmed"
+    case processing = "processing"
+    case shipped = "shipped"
+    case delivered = "delivered"
+    case cancelled = "cancelled"
+}
 ```
-User {
-  id: String
-  name: String
-  email: String
-}
 
-Product {
-  id: String
-  title: String
-  description: String
-  price: Double
-  imageURL: String
-  category: String
-  rating: Double
-  stock: Int
-  brand: String
-}
-
-Category {
-  id: String
-  name: String
-  imageURL: String?
-  productCount: Int
-}
-
-Order {
-  id: String
-  userId: String
-  items: [OrderItem]
-  totalAmount: Double
-  status: OrderStatus
-  orderDate: Date
-  deliveryDate: Date?
-  shippingAddress: String
-}
-
-CartItem {
-  id: String
-  product: Product
-  quantity: Int
-  dateAdded: Date
-}
-
-WishlistItem {
-  id: String
-  product: Product
-  dateAdded: Date
-}
-```
+</details>
 
 ### **State Management Strategy**
 
 #### **Global State Managers**
-```
-AuthenticationManager (Singleton)
-├── @Published isAuthenticated: Bool
-├── @Published currentUser: User?
-├── authToken: String? (UserDefaults)
-└── Session Management Methods
 
-CartDataManager (Singleton)
-├── @Published cartItems: [CartItem]
-├── In-Memory Storage
-└── Real-time UI Updates
-
-WishlistDataManager (Singleton)
-├── @Published wishlistItems: [WishlistItem]
-├── In-Memory Storage
-└── Real-time UI Updates
-
-AppRouter (StateObject)
-├── @Published Navigation States
-├── Sheet Presentation Management
-└── Cross-Module Navigation
+```mermaid
+classDiagram
+    class AuthenticationManager {
+        <<Singleton>>
+        +@Published isAuthenticated: Bool
+        +@Published currentUser: User?
+        +authToken: String?
+        +signIn(email, password)
+        +register(name, email, password)
+        +signOut()
+        +loadSession()
+        +saveSession(user, token)
+    }
+    
+    class CartDataManager {
+        <<Singleton>>
+        +@Published cartItems: [CartItem]
+        +addToCart(product, quantity)
+        +removeFromCart(itemId)
+        +updateQuantity(itemId, quantity)
+        +clearCart()
+        +getCartTotal()
+    }
+    
+    class WishlistDataManager {
+        <<Singleton>>
+        +@Published wishlistItems: [WishlistItem]
+        +addToWishlist(product)
+        +removeFromWishlist(itemId)
+        +isInWishlist(productId)
+        +getWishlistCount()
+    }
+    
+    class AppRouter {
+        <<StateObject>>
+        +@Published selectedProduct: Product?
+        +@Published selectedOrder: Order?
+        +@Published showingProductDetail: Bool
+        +@Published showingCart: Bool
+        +@Published showingMenu: Bool
+        +navigateToProductDetail(product)
+        +navigateToCart()
+        +navigateToMenu()
+    }
+    
+    AuthenticationManager --> UserDefaults : stores token
+    CartDataManager --> Memory : in-memory storage
+    WishlistDataManager --> Memory : in-memory storage
+    AppRouter --> SwiftUIViews : navigation control
 ```
 
 ### **Security & Data Protection**
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Security Layers                         │
-├─────────────────────────────────────────────────────────────┤
-│  1. Authentication Token (UserDefaults - Encrypted)        │
-│  2. HTTPS API Communication (TLS/SSL)                      │
-│  3. Input Validation (Client-Side)                         │
-│  4. Error Handling (No Sensitive Data Exposure)            │
-│  5. Session Management (Auto-Refresh + Expiry)             │
-└─────────────────────────────────────────────────────────────┘
-```
+#### **Security Architecture**
 
-## 📋 **Key Design Decisions**
-
-### **Architecture Benefits:**
-1. **VIPER Pattern**: Clean separation of concerns across all modules
-2. **SwiftUI + Combine**: Modern reactive UI with data binding
-3. **Async/Await**: Modern concurrency for network operations
-4. **In-Memory State**: Optimal performance for transient data (Cart/Wishlist)
-5. **API-First**: Complete removal of Core Data for server-driven architecture
-
-### **Data Flow Principles:**
-1. **Unidirectional Flow**: Data flows from API → Interactor → Presenter → View
-2. **Reactive Updates**: `@Published` properties ensure real-time UI updates
-3. **Centralized Navigation**: AppRouter manages all screen transitions
-4. **Session Persistence**: UserDefaults for authentication state
-5. **Error Propagation**: Comprehensive error handling at all layers
-
-### **Performance Optimizations:**
-1. **Lazy Loading**: Views load data on-demand
-2. **Image Caching**: AsyncImage with automatic caching
-3. **Memory Management**: In-memory data for frequently accessed items
-4. **API Efficiency**: Targeted endpoints for specific data needs
-
-## 🔄 **Complete User Journey Flow**
-
-```
-App Launch → Authentication Check → SignIn/Home Decision
-     │                                      │
-     ▼                                      ▼
-Authentication Failed                   Home View
-     │                                      │
-     ▼                                      ▼
-SignIn Screen                          Category Selection
-     │                                      │
-     ▼                                      ▼
-Login Success                          Product Browsing
-     │                                      │
-     ▼                                      ▼
-Token Storage                          Product Detail
-     │                                      │
-     ▼                                      ▼
-Navigate to Home                       Add to Cart/Wishlist
-                                           │
-                                           ▼
-                                      Cart Management
-                                           │
-                                           ▼
-                                      Payment Process
-                                           │
-                                           ▼
-                                      Order Creation
-                                           │
-                                           ▼
-                                      Order History
+```mermaid
+flowchart TD
+    subgraph "Application Security Layers"
+        A[Input Validation Layer]
+        B[Authentication Layer]
+        C[Authorization Layer]
+        D[Data Encryption Layer]
+        E[Network Security Layer]
+    end
+    
+    subgraph "Implementation Details"
+        F[Client-Side Validation]
+        G[JWT Token Management]
+        H[UserDefaults Encryption]
+        I[HTTPS/TLS Communication]
+        J[Error Handling without Exposure]
+    end
+    
+    A --> F
+    B --> G
+    C --> G
+    D --> H
+    E --> I
+    E --> J
+    
+    subgraph "Security Controls"
+        K[Session Timeout]
+        L[Token Refresh]
+        M[Secure Storage]
+        N[API Rate Limiting]
+    end
+    
+    G --> K
+    G --> L
+    H --> M
+    I --> N
 ```
 
-This comprehensive HLD and DFD documentation provides a complete technical overview of your iOS eCommerce application's architecture, data flow, and design decisions. You can save this as a separate documentation file or integrate it into your existing README for future reference and team onboarding.
+#### **Data Protection Measures**
 
-**🎯 The design emphasizes modularity, maintainability, and scalability while following modern iOS development best practices!**
+| **Security Layer** | **Implementation** | **Purpose** |
+|-------------------|-------------------|-------------|
+| **Authentication** | JWT Token + UserDefaults | Secure user session management |
+| **Network** | HTTPS + TLS/SSL | Encrypted API communication |
+| **Data Storage** | UserDefaults + In-Memory | Minimal persistent data exposure |
+| **Input Validation** | Client-side validation | Prevent malicious input |
+| **Error Handling** | Generic error messages | No sensitive data exposure |
+| **Session Management** | Auto-refresh + Expiry | Prevent session hijacking |
 
+### **Performance Optimizations**
+
+#### **App Performance Strategy**
+
+```mermaid
+mindmap
+    root((Performance))
+        UI Optimization
+            Lazy Loading
+            Image Caching
+            Async Image Loading
+            SwiftUI State Management
+        Memory Management
+            In-Memory Cart/Wishlist
+            Singleton Managers
+            Weak References
+            ARC Optimization
+        Network Efficiency
+            async/await Patterns
+            Background Queue Processing
+            Request Batching
+            Response Caching
+        Architecture Benefits
+            VIPER Separation
+            Modular Components
+            Testable Code
+            Scalable Design
+```
+
+### **Complete User Journey Flow**
+
+```mermaid
+flowchart TD
+    A[App Launch] --> B{Authentication Check}
+    B -->|Not Authenticated| C[SignIn Screen]
+    B -->|Authenticated| D[Home View]
+    
+    C --> E[Enter Credentials]
+    E --> F{Login Success?}
+    F -->|No| G[Show Error Alert]
+    F -->|Yes| H[Store Token]
+    G --> C
+    H --> D
+    
+    D --> I[Browse Categories]
+    I --> J[Select Category]
+    J --> K[View Products]
+    K --> L[Select Product]
+    L --> M[Product Detail View]
+    
+    M --> N{User Action}
+    N -->|Add to Cart| O[Update Cart Badge]
+    N -->|Add to Wishlist| P[Update Wishlist]
+    N -->|Buy Now| Q[Go to Payment]
+    
+    O --> R[Continue Shopping]
+    P --> R
+    R --> K
+    
+    Q --> S[Payment Process]
+    S --> T[Create Order]
+    T --> U[Order Confirmation]
+    U --> V[Order History]
+    
+    D --> W[Menu Button]
+    W --> X[Side Menu]
+    X --> Y{Menu Option}
+    Y -->|Order History| V
+    Y -->|Sign Out| Z[Clear Session]
+    Z --> C
+    
+    V --> AA[Select Order]
+    AA --> BB[Order Detail View]
+    BB --> V
+```
+
+## 📊 Key Design Decisions & Benefits
+
+### **Architecture Benefits**
+1. **🏗️ VIPER Pattern**: Clean separation of concerns across all modules
+2. **⚡ SwiftUI + Combine**: Modern reactive UI with real-time data binding
+3. **🔄 Async/Await**: Modern Swift concurrency for network operations
+4. **🧠 In-Memory State**: Optimal performance for transient data (Cart/Wishlist)
+5. **🌐 API-First**: Complete server-driven architecture for scalability
+
+### **Data Flow Principles**
+1. **➡️ Unidirectional Flow**: Data flows from API → Interactor → Presenter → View
+2. **🔄 Reactive Updates**: `@Published` properties ensure real-time UI updates
+3. **🎯 Centralized Navigation**: AppRouter manages all screen transitions
+4. **💾 Session Persistence**: UserDefaults for authentication state
+5. **⚠️ Error Propagation**: Comprehensive error handling at all layers
+
+### **Performance Benefits**
+1. **⚡ Lazy Loading**: Views load data on-demand for optimal performance
+2. **🖼️ Image Caching**: AsyncImage with automatic caching mechanisms
+3. **🧠 Memory Management**: In-memory data for frequently accessed items
+4. **🎯 API Efficiency**: Targeted endpoints for specific data requirements
+5. **📱 Responsive UI**: Adaptive layout for all iPhone screen sizes
+
+---
+
+*This comprehensive technical documentation provides a complete reference for the iOS eCommerce application's architecture, data flow, and implementation details. The design emphasizes modularity, maintainability, and scalability while following modern iOS development best practices.*
