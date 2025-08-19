@@ -15,13 +15,17 @@ protocol HomePresenterProtocol: ObservableObject {
     var categories: [Category] { get }
     var selectedCategory: Category? { get set }
     var isLoading: Bool { get }
-    var errorMessage: String? { get }
+    var isLoadingMore: Bool { get }
+    var error: NetworkError? { get }
     var searchText: String { get set }
+    var hasMoreProducts: Bool { get }
     
     func fetchProducts()
+    func loadMoreProducts()
     func fetchCategories()
     func searchProducts()
     func selectCategory(_ category: Category?)
+    func refreshProducts()
     func clearError()
 }
 
@@ -32,16 +36,27 @@ class HomePresenter: HomePresenterProtocol {
     @Published var categories: [Category] = []
     @Published var selectedCategory: Category? = nil {
         didSet {
+            resetPagination()
             fetchProductsByCategory()
         }
     }
     @Published var isLoading = false
-    @Published var errorMessage: String? = nil
+    @Published var isLoadingMore = false
+    @Published var error: NetworkError? = nil
     @Published var searchText = "" {
         didSet {
-            searchProducts()
+            if oldValue != searchText {
+                resetPagination()
+                searchProducts()
+            }
         }
     }
+    @Published var hasMoreProducts = true
+    
+    // Pagination properties
+    private var currentPage = 1
+    private let pageSize = 20
+    private var totalPages = 1
     
     var filteredProducts: [Product] {
         var filtered = products
@@ -73,30 +88,92 @@ class HomePresenter: HomePresenterProtocol {
     func fetchProducts() {
         Task {
             isLoading = true
-            errorMessage = nil
+            error = nil
             
             do {
-                let fetchedProducts = try await interactor.fetchProducts()
-                self.products = fetchedProducts
+                let result = try await interactor.fetchProducts(page: currentPage, limit: pageSize, category: selectedCategory?.id)
+                
+                if currentPage == 1 {
+                    self.products = result.products
+                } else {
+                    self.products.append(contentsOf: result.products)
+                }
+                
+                self.hasMoreProducts = result.hasMore
+                self.totalPages = result.totalPages
+                
+            } catch let networkError as NetworkError {
+                self.error = networkError
             } catch {
-                self.errorMessage = error.localizedDescription
+                self.error = NetworkError.networkFailure(error.localizedDescription)
             }
             
             isLoading = false
         }
     }
     
-    func searchProducts() {
-        guard !searchText.isEmpty else { return }
+    func loadMoreProducts() {
+        guard hasMoreProducts && !isLoading && !isLoadingMore else { return }
         
         Task {
+            isLoadingMore = true
+            error = nil
+            currentPage += 1
+            
+            do {
+                let result = try await interactor.fetchProducts(page: currentPage, limit: pageSize, category: selectedCategory?.id)
+                
+                self.products.append(contentsOf: result.products)
+                self.hasMoreProducts = result.hasMore
+                self.totalPages = result.totalPages
+                
+            } catch let networkError as NetworkError {
+                self.error = networkError
+                currentPage -= 1 // Revert page increment on error
+            } catch {
+                self.error = NetworkError.networkFailure(error.localizedDescription)
+                currentPage -= 1
+            }
+            
+            isLoadingMore = false
+        }
+    }
+    
+    func refreshProducts() {
+        resetPagination()
+        fetchProducts()
+    }
+    
+    private func resetPagination() {
+        currentPage = 1
+        hasMoreProducts = true
+        products.removeAll()
+    }
+    
+    func searchProducts() {
+        guard !searchText.isEmpty else { 
+            if selectedCategory == nil {
+                refreshProducts()
+            }
+            return 
+        }
+        
+        Task {
+            isLoading = true
+            error = nil
+            
             do {
                 let searchResults = try await interactor.searchProducts(query: searchText)
-                // For local filtering, we'll use the computed property
-                // If you want server-side search, you would set products = searchResults here
+                self.products = searchResults
+                // Reset pagination state for search results
+                self.hasMoreProducts = false
+            } catch let networkError as NetworkError {
+                self.error = networkError
             } catch {
-                self.errorMessage = error.localizedDescription
+                self.error = NetworkError.networkFailure(error.localizedDescription)
             }
+            
+            isLoading = false
         }
     }
     
@@ -105,8 +182,10 @@ class HomePresenter: HomePresenterProtocol {
             do {
                 let fetchedCategories = try await interactor.fetchCategories()
                 self.categories = fetchedCategories
+            } catch let networkError as NetworkError {
+                self.error = networkError
             } catch {
-                self.errorMessage = error.localizedDescription
+                self.error = NetworkError.networkFailure(error.localizedDescription)
             }
         }
     }
@@ -123,13 +202,17 @@ class HomePresenter: HomePresenterProtocol {
         
         Task {
             isLoading = true
-            errorMessage = nil
+            error = nil
             
             do {
                 let fetchedProducts = try await interactor.fetchProductsByCategory(categoryId: selectedCategory.id)
                 self.products = fetchedProducts
+                // Reset pagination state for category filtering
+                self.hasMoreProducts = false
+            } catch let networkError as NetworkError {
+                self.error = networkError
             } catch {
-                self.errorMessage = error.localizedDescription
+                self.error = NetworkError.networkFailure(error.localizedDescription)
             }
             
             isLoading = false
@@ -137,6 +220,6 @@ class HomePresenter: HomePresenterProtocol {
     }
     
     func clearError() {
-        errorMessage = nil
+        error = nil
     }
 }

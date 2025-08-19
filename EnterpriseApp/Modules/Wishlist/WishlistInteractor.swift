@@ -10,11 +10,11 @@ import Foundation
 // MARK: - Wishlist Interactor Protocol
 protocol WishlistInteractorProtocol {
     func getWishlistItems() -> [WishlistItem]
-    func addToWishlist(product: Product)
-    func removeFromWishlist(productId: String)
+    func addToWishlist(product: Product) async
+    func removeFromWishlist(itemId: String) async
     func isInWishlist(productId: String) -> Bool
     func getWishlistItemCount() -> Int
-    func clearWishlist()
+    func clearWishlist() async
 }
 
 // MARK: - Wishlist Interactor Implementation
@@ -26,15 +26,15 @@ class WishlistInteractor: WishlistInteractorProtocol {
     }
     
     func getWishlistItems() -> [WishlistItem] {
-        return wishlistDataManager.getWishlistItems()
+        return wishlistDataManager.wishlistItems
     }
     
-    func addToWishlist(product: Product) {
-        wishlistDataManager.addToWishlist(product: product)
+    func addToWishlist(product: Product) async {
+        await wishlistDataManager.addToWishlist(product: product)
     }
     
-    func removeFromWishlist(productId: String) {
-        wishlistDataManager.removeFromWishlist(productId: productId)
+    func removeFromWishlist(itemId: String) async {
+        await wishlistDataManager.removeFromWishlist(itemId: itemId)
     }
     
     func isInWishlist(productId: String) -> Bool {
@@ -45,10 +45,10 @@ class WishlistInteractor: WishlistInteractorProtocol {
         return wishlistDataManager.getWishlistItemCount()
     }
     
-    func clearWishlist() {
-        let items = wishlistDataManager.getWishlistItems()
+    func clearWishlist() async {
+        let items = wishlistDataManager.wishlistItems
         for item in items {
-            wishlistDataManager.removeFromWishlist(productId: item.product.id)
+            await wishlistDataManager.removeFromWishlist(itemId: item.id)
         }
     }
 }

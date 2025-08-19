@@ -10,54 +10,141 @@ import Combine
 
 // MARK: - Cart Data Manager Protocol
 protocol CartDataManagerProtocol {
-    func addToCart(product: Product, quantity: Int)
-    func removeFromCart(productId: String)
-    func updateCartItemQuantity(productId: String, quantity: Int)
-    func clearCart()
-    func getCartItems() -> [CartItem]
+    var cartItems: [CartItem] { get }
+    var isLoading: Bool { get }
+    var error: NetworkError? { get }
+    
+    func addToCart(product: Product, quantity: Int) async
+    func removeFromCart(itemId: String) async
+    func updateCartItemQuantity(itemId: String, quantity: Int) async
+    func clearCart() async
+    func fetchCartItems() async
     func isInCart(productId: String) -> Bool
     func getCartItemQuantity(productId: String) -> Int
     func getCartTotal() -> Double
     func getCartItemCount() -> Int
+    func clearError()
 }
 
-// MARK: - In-Memory Cart Data Manager
+// MARK: - Live Cart Data Manager with API Integration
 class CartDataManager: CartDataManagerProtocol, ObservableObject {
-    static let shared = CartDataManager()
+    nonisolated static let shared = CartDataManager()
     
     @Published var cartItems: [CartItem] = []
+    @Published var isLoading: Bool = false
+    @Published var error: NetworkError? = nil
     
-    private init() {}
+    private let networkService = LiveNetworkService.shared
     
-    func addToCart(product: Product, quantity: Int = 1) {
-        if let existingItemIndex = cartItems.firstIndex(where: { $0.product.id == product.id }) {
-            cartItems[existingItemIndex].quantity += quantity
-        } else {
-            let newCartItem = CartItem(product: product, quantity: quantity)
-            cartItems.append(newCartItem)
+    private init() {
+        // Load cart items on initialization
+        Task {
+            await fetchCartItems()
         }
     }
     
-    func removeFromCart(productId: String) {
-        cartItems.removeAll { $0.product.id == productId }
-    }
-    
-    func updateCartItemQuantity(productId: String, quantity: Int) {
-        if quantity <= 0 {
-            removeFromCart(productId: productId)
-        } else {
-            if let index = cartItems.firstIndex(where: { $0.product.id == productId }) {
-                cartItems[index].quantity = quantity
+    @MainActor
+    func addToCart(product: Product, quantity: Int = 1) async {
+        isLoading = true
+        error = nil
+        
+        do {
+            try await networkService.addToCart(productId: product.id, quantity: quantity)
+            
+            // Update local state optimistically
+            if let existingItemIndex = cartItems.firstIndex(where: { $0.product.id == product.id }) {
+                cartItems[existingItemIndex].quantity += quantity
+            } else {
+                let newCartItem = CartItem(product: product, quantity: quantity)
+                cartItems.append(newCartItem)
             }
+            
+            // Refresh cart from server to ensure consistency
+            await fetchCartItems()
+        } catch let networkError as NetworkError {
+            self.error = networkError
+        } catch {
+            self.error = NetworkError.networkFailure(error.localizedDescription)
         }
+        
+        isLoading = false
     }
     
-    func clearCart() {
-        cartItems.removeAll()
+    @MainActor
+    func removeFromCart(itemId: String) async {
+        isLoading = true
+        error = nil
+        
+        do {
+            try await networkService.removeFromCart(itemId: itemId)
+            
+            // Update local state
+            cartItems.removeAll { $0.id == itemId }
+        } catch let networkError as NetworkError {
+            self.error = networkError
+        } catch {
+            self.error = NetworkError.networkFailure(error.localizedDescription)
+        }
+        
+        isLoading = false
     }
     
-    func getCartItems() -> [CartItem] {
-        return cartItems.sorted { $0.dateAdded > $1.dateAdded }
+    @MainActor
+    func updateCartItemQuantity(itemId: String, quantity: Int) async {
+        isLoading = true
+        error = nil
+        
+        do {
+            if quantity <= 0 {
+                try await networkService.removeFromCart(itemId: itemId)
+                cartItems.removeAll { $0.id == itemId }
+            } else {
+                try await networkService.updateCartItem(itemId: itemId, quantity: quantity)
+                if let index = cartItems.firstIndex(where: { $0.id == itemId }) {
+                    cartItems[index].quantity = quantity
+                }
+            }
+        } catch let networkError as NetworkError {
+            self.error = networkError
+        } catch {
+            self.error = NetworkError.networkFailure(error.localizedDescription)
+        }
+        
+        isLoading = false
+    }
+    
+    @MainActor
+    func clearCart() async {
+        isLoading = true
+        error = nil
+        
+        do {
+            try await networkService.clearCart()
+            cartItems.removeAll()
+        } catch let networkError as NetworkError {
+            self.error = networkError
+        } catch {
+            self.error = NetworkError.networkFailure(error.localizedDescription)
+        }
+        
+        isLoading = false
+    }
+    
+    @MainActor
+    func fetchCartItems() async {
+        isLoading = true
+        error = nil
+        
+        do {
+            let fetchedCartItems = try await networkService.getCart()
+            cartItems = fetchedCartItems.sorted { $0.dateAdded > $1.dateAdded }
+        } catch let networkError as NetworkError {
+            self.error = networkError
+        } catch {
+            self.error = NetworkError.networkFailure(error.localizedDescription)
+        }
+        
+        isLoading = false
     }
     
     func isInCart(productId: String) -> Bool {
@@ -74,5 +161,9 @@ class CartDataManager: CartDataManagerProtocol, ObservableObject {
     
     func getCartItemCount() -> Int {
         return cartItems.reduce(0) { $0 + $1.quantity }
+    }
+    
+    func clearError() {
+        error = nil
     }
 }

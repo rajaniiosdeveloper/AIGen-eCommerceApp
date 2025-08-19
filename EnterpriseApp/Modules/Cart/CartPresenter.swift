@@ -16,9 +16,9 @@ protocol CartPresenterProtocol: ObservableObject {
     var formattedCartTotal: String { get }
     
     func loadCartItems()
-    func removeFromCart(productId: String)
-    func updateCartItemQuantity(productId: String, quantity: Int)
-    func clearCart()
+    func removeFromCart(itemId: String) async
+    func updateCartItemQuantity(itemId: String, quantity: Int) async
+    func clearCart() async
 }
 
 // MARK: - Cart Presenter Implementation
@@ -60,15 +60,15 @@ class CartPresenter: CartPresenterProtocol {
         cartItems = interactor.getCartItems()
     }
     
-    func removeFromCart(productId: String) {
-        interactor.removeFromCart(productId: productId)
+    func removeFromCart(itemId: String) async {
+        await interactor.removeFromCart(itemId: itemId)
     }
     
-    func updateCartItemQuantity(productId: String, quantity: Int) {
-        interactor.updateCartItemQuantity(productId: productId, quantity: quantity)
+    func updateCartItemQuantity(itemId: String, quantity: Int) async {
+        await interactor.updateCartItemQuantity(itemId: itemId, quantity: quantity)
     }
     
-    func clearCart() {
-        interactor.clearCart()
+    func clearCart() async {
+        await interactor.clearCart()
     }
 }

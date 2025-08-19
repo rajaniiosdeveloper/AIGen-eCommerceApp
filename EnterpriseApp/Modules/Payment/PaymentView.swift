@@ -82,7 +82,7 @@ struct PaymentView: View {
     
     private var cartItemsView: some View {
         VStack(spacing: 12) {
-            ForEach(Array(cartDataManager.getCartItems().prefix(3)), id: \.id) { cartItem in
+            ForEach(Array(cartDataManager.cartItems.prefix(3)), id: \.id) { cartItem in
                 HStack(spacing: 12) {
                     AsyncImageView(
                         url: cartItem.product.imageURL,
@@ -114,8 +114,8 @@ struct PaymentView: View {
                 }
             }
             
-            if cartDataManager.getCartItems().count > 3 {
-                Text("... and \(cartDataManager.getCartItems().count - 3) more items")
+            if cartDataManager.cartItems.count > 3 {
+                Text("... and \(cartDataManager.cartItems.count - 3) more items")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.top, 4)
@@ -211,7 +211,9 @@ struct PaymentView: View {
                 paymentMethod: selectedPaymentMethod.displayName
             ) {
                 if isFromCart {
-                                            cartDataManager.clearCart()
+                    Task {
+                        await cartDataManager.clearCart()
+                    }
                 }
                 dismiss()
             }
@@ -396,5 +398,15 @@ class PaymentInteractor {
 
 // MARK: - Preview
 #Preview {
-    PaymentView(product: MockData.sampleProducts[0])
+    PaymentView(product: Product(
+        id: "preview-product",
+        title: "Sample Product",
+        description: "This is a sample product for preview purposes.",
+        price: 299.99,
+        imageURL: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400",
+        category: "Electronics",
+        rating: 4.5,
+        stock: 10,
+        brand: "Sample Brand"
+    ))
 }

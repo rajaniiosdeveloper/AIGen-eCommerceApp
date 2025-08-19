@@ -58,13 +58,43 @@ struct HomeView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
             
-            // Content - List View
+            // Content - List View with Infinite Scroll
             ScrollView {
                 LazyVStack(spacing: 12) {
                     ForEach(presenter.filteredProducts) { product in
                         ProductListRowView(product: product) {
                             onProductTap(product)
                         }
+                        .onAppear {
+                            // Trigger load more when approaching the end
+                            if product.id == presenter.filteredProducts.last?.id && presenter.hasMoreProducts {
+                                presenter.loadMoreProducts()
+                            }
+                        }
+                    }
+                    
+                    // Loading more indicator
+                    if presenter.isLoadingMore {
+                        HStack {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                            Text("Loading more products...")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.vertical, 12)
+                    }
+                    
+                    // No more products indicator
+                    if !presenter.hasMoreProducts && !presenter.products.isEmpty && !presenter.isLoading {
+                        HStack {
+                            Image(systemName: "checkmark.circle")
+                                .foregroundColor(.green)
+                            Text("All products loaded")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.vertical, 12)
                     }
                 }
                 .padding(.horizontal, 20) // Side spacing from screen edges
@@ -72,7 +102,7 @@ struct HomeView: View {
                 .padding(.bottom, 24)
             }
             .refreshable {
-                presenter.fetchProducts()
+                presenter.refreshProducts()
             }
         }
         .background(Color(.systemGroupedBackground))
@@ -85,16 +115,15 @@ struct HomeView: View {
                 }
             }
         )
-        .alert("Error", isPresented: .constant(presenter.errorMessage != nil)) {
-            Button("OK") {
+        .errorToast(
+            error: presenter.error,
+            onRetry: {
+                presenter.refreshProducts()
+            },
+            onDismiss: {
                 presenter.clearError()
             }
-            Button("Retry") {
-                presenter.fetchProducts()
-            }
-        } message: {
-            Text(presenter.errorMessage ?? "")
-        }
+        )
         .onAppear {
             if presenter.products.isEmpty {
                 presenter.fetchProducts()
@@ -164,30 +193,52 @@ struct ProductListRowView: View {
             VStack(spacing: 8) {
                 // Wishlist Button
                 Button(action: {
-                    if wishlistDataManager.isInWishlist(productId: product.id) {
-                        wishlistDataManager.removeFromWishlist(productId: product.id)
-                    } else {
-                        wishlistDataManager.addToWishlist(product: product)
+                    Task {
+                        if wishlistDataManager.isInWishlist(productId: product.id) {
+                            if let item = wishlistDataManager.wishlistItems.first(where: { $0.product.id == product.id }) {
+                                await wishlistDataManager.removeFromWishlist(itemId: item.id)
+                            }
+                        } else {
+                            await wishlistDataManager.addToWishlist(product: product)
+                        }
                     }
                 }) {
-                    Image(systemName: wishlistDataManager.isInWishlist(productId: product.id) ? "heart.fill" : "heart")
-                        .font(.title2)
-                        .foregroundColor(wishlistDataManager.isInWishlist(productId: product.id) ? .red : .gray)
-                        .frame(width: 32, height: 32)
+                    ZStack {
+                        Image(systemName: wishlistDataManager.isInWishlist(productId: product.id) ? "heart.fill" : "heart")
+                            .font(.title2)
+                            .foregroundColor(wishlistDataManager.isInWishlist(productId: product.id) ? .red : .gray)
+                            .frame(width: 32, height: 32)
+                        
+                        if wishlistDataManager.isLoading {
+                            ProgressView()
+                                .scaleEffect(0.5)
+                        }
+                    }
                 }
+                .disabled(wishlistDataManager.isLoading)
                 
                 // Add to Cart Button
                 Button(action: {
-                    cartDataManager.addToCart(product: product)
+                    Task {
+                        await cartDataManager.addToCart(product: product)
+                    }
                 }) {
-                    Image(systemName: "cart.badge.plus")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                        .frame(width: 32, height: 32)
-                        .background(product.isInStock ? Color.blue : Color.gray)
-                        .cornerRadius(8)
+                    ZStack {
+                        Image(systemName: "cart.badge.plus")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .frame(width: 32, height: 32)
+                            .background(product.isInStock ? Color.blue : Color.gray)
+                            .cornerRadius(8)
+                        
+                        if cartDataManager.isLoading {
+                            ProgressView()
+                                .scaleEffect(0.5)
+                                .tint(.white)
+                        }
+                    }
                 }
-                .disabled(!product.isInStock)
+                .disabled(!product.isInStock || cartDataManager.isLoading)
             }
         }
         .padding(12)

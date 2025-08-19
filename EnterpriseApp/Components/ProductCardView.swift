@@ -72,7 +72,9 @@ struct ProductCardView: View {
                 HStack(spacing: 6) {
                     // Add to Cart Button
                     Button(action: {
-                        cartDataManager.addToCart(product: product)
+                        Task {
+                            await cartDataManager.addToCart(product: product)
+                        }
                     }) {
                         HStack(spacing: 3) {
                             Image(systemName: "cart.badge.plus")
@@ -91,10 +93,14 @@ struct ProductCardView: View {
                     
                     // Wishlist Button
                     Button(action: {
-                        if wishlistDataManager.isInWishlist(productId: product.id) {
-                            wishlistDataManager.removeFromWishlist(productId: product.id)
-                        } else {
-                            wishlistDataManager.addToWishlist(product: product)
+                        Task {
+                            if wishlistDataManager.isInWishlist(productId: product.id) {
+                                if let item = wishlistDataManager.wishlistItems.first(where: { $0.product.id == product.id }) {
+                                    await wishlistDataManager.removeFromWishlist(itemId: item.id)
+                                }
+                            } else {
+                                await wishlistDataManager.addToWishlist(product: product)
+                            }
                         }
                     }) {
                         Image(systemName: wishlistDataManager.isInWishlist(productId: product.id) ? "heart.fill" : "heart")

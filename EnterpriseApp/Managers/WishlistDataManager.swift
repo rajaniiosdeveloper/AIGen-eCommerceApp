@@ -10,34 +10,94 @@ import Combine
 
 // MARK: - Wishlist Data Manager Protocol
 protocol WishlistDataManagerProtocol {
-    func addToWishlist(product: Product)
-    func removeFromWishlist(productId: String)
-    func getWishlistItems() -> [WishlistItem]
+    var wishlistItems: [WishlistItem] { get }
+    var isLoading: Bool { get }
+    var error: NetworkError? { get }
+    
+    func addToWishlist(product: Product) async
+    func removeFromWishlist(itemId: String) async
+    func fetchWishlistItems() async
     func isInWishlist(productId: String) -> Bool
     func getWishlistItemCount() -> Int
+    func clearError()
 }
 
-// MARK: - In-Memory Wishlist Data Manager
+// MARK: - Live Wishlist Data Manager with API Integration
 class WishlistDataManager: WishlistDataManagerProtocol, ObservableObject {
-    static let shared = WishlistDataManager()
+    nonisolated static let shared = WishlistDataManager()
     
     @Published var wishlistItems: [WishlistItem] = []
+    @Published var isLoading: Bool = false
+    @Published var error: NetworkError? = nil
     
-    private init() {}
+    private let networkService = LiveNetworkService.shared
     
-    func addToWishlist(product: Product) {
-        if !isInWishlist(productId: product.id) {
-            let newWishlistItem = WishlistItem(product: product)
-            wishlistItems.append(newWishlistItem)
+    private init() {
+        // Load wishlist items on initialization
+        Task {
+            await fetchWishlistItems()
         }
     }
     
-    func removeFromWishlist(productId: String) {
-        wishlistItems.removeAll { $0.product.id == productId }
+    @MainActor
+    func addToWishlist(product: Product) async {
+        isLoading = true
+        error = nil
+        
+        do {
+            try await networkService.addToWishlist(productId: product.id)
+            
+            // Update local state optimistically
+            if !isInWishlist(productId: product.id) {
+                let newWishlistItem = WishlistItem(product: product)
+                wishlistItems.append(newWishlistItem)
+            }
+            
+            // Refresh wishlist from server to ensure consistency
+            await fetchWishlistItems()
+        } catch let networkError as NetworkError {
+            self.error = networkError
+        } catch {
+            self.error = NetworkError.networkFailure(error.localizedDescription)
+        }
+        
+        isLoading = false
     }
     
-    func getWishlistItems() -> [WishlistItem] {
-        return wishlistItems.sorted { $0.dateAdded > $1.dateAdded }
+    @MainActor
+    func removeFromWishlist(itemId: String) async {
+        isLoading = true
+        error = nil
+        
+        do {
+            try await networkService.removeFromWishlist(itemId: itemId)
+            
+            // Update local state
+            wishlistItems.removeAll { $0.id == itemId }
+        } catch let networkError as NetworkError {
+            self.error = networkError
+        } catch {
+            self.error = NetworkError.networkFailure(error.localizedDescription)
+        }
+        
+        isLoading = false
+    }
+    
+    @MainActor
+    func fetchWishlistItems() async {
+        isLoading = true
+        error = nil
+        
+        do {
+            let fetchedWishlistItems = try await networkService.getWishlist()
+            wishlistItems = fetchedWishlistItems.sorted { $0.dateAdded > $1.dateAdded }
+        } catch let networkError as NetworkError {
+            self.error = networkError
+        } catch {
+            self.error = NetworkError.networkFailure(error.localizedDescription)
+        }
+        
+        isLoading = false
     }
     
     func isInWishlist(productId: String) -> Bool {
@@ -46,5 +106,9 @@ class WishlistDataManager: WishlistDataManagerProtocol, ObservableObject {
     
     func getWishlistItemCount() -> Int {
         return wishlistItems.count
+    }
+    
+    func clearError() {
+        error = nil
     }
 }

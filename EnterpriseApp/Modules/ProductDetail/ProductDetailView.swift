@@ -164,7 +164,9 @@ struct ProductDetailView: View {
                         // Add to Cart & Wishlist Row
                         HStack(spacing: 12) {
                             Button(action: {
-                                presenter.addToCart(product: product, quantity: quantity)
+                                Task {
+                                    await presenter.addToCart(product: product, quantity: quantity)
+                                }
                                 showingAddedToCart = true
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                     showingAddedToCart = false
@@ -187,13 +189,15 @@ struct ProductDetailView: View {
                             .disabled(!product.isInStock)
                             
                             Button(action: {
-                                if presenter.isInWishlist(productId: product.id) {
-                                    presenter.removeFromWishlist(productId: product.id)
-                                } else {
-                                    presenter.addToWishlist(product: product)
-                                    showingAddedToWishlist = true
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                        showingAddedToWishlist = false
+                                Task {
+                                    if presenter.isInWishlist(productId: product.id) {
+                                        await presenter.removeFromWishlist(productId: product.id)
+                                    } else {
+                                        await presenter.addToWishlist(product: product)
+                                        showingAddedToWishlist = true
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                            showingAddedToWishlist = false
+                                        }
                                     }
                                 }
                             }) {
@@ -299,16 +303,19 @@ class ProductDetailPresenter: ObservableObject {
     private let cartInteractor = CartInteractor()
     private let wishlistInteractor = WishlistInteractor()
     
-    func addToCart(product: Product, quantity: Int) {
-        cartInteractor.addToCart(product: product, quantity: quantity)
+    func addToCart(product: Product, quantity: Int) async {
+        await cartInteractor.addToCart(product: product, quantity: quantity)
     }
     
-    func addToWishlist(product: Product) {
-        wishlistInteractor.addToWishlist(product: product)
+    func addToWishlist(product: Product) async {
+        await wishlistInteractor.addToWishlist(product: product)
     }
     
-    func removeFromWishlist(productId: String) {
-        wishlistInteractor.removeFromWishlist(productId: productId)
+    func removeFromWishlist(productId: String) async {
+        // Find the wishlist item first to get its ID
+        if let item = wishlistInteractor.getWishlistItems().first(where: { $0.product.id == productId }) {
+            await wishlistInteractor.removeFromWishlist(itemId: item.id)
+        }
     }
     
     func isInWishlist(productId: String) -> Bool {
@@ -320,7 +327,17 @@ class ProductDetailPresenter: ObservableObject {
 #Preview {
     NavigationView {
         ProductDetailView(
-            product: MockData.sampleProducts[0],
+            product: Product(
+                id: "preview-product",
+                title: "Sample Product",
+                description: "This is a sample product for preview purposes.",
+                price: 299.99,
+                imageURL: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400",
+                category: "Electronics",
+                rating: 4.5,
+                stock: 10,
+                brand: "Sample Brand"
+            ),
             onBuyNow: { _ in }
         )
     }

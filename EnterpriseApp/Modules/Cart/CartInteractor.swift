@@ -10,10 +10,10 @@ import Foundation
 // MARK: - Cart Interactor Protocol
 protocol CartInteractorProtocol {
     func getCartItems() -> [CartItem]
-    func addToCart(product: Product, quantity: Int)
-    func removeFromCart(productId: String)
-    func updateCartItemQuantity(productId: String, quantity: Int)
-    func clearCart()
+    func addToCart(product: Product, quantity: Int) async
+    func removeFromCart(itemId: String) async
+    func updateCartItemQuantity(itemId: String, quantity: Int) async
+    func clearCart() async
     func isInCart(productId: String) -> Bool
     func getCartItemQuantity(productId: String) -> Int
     func getCartTotal() -> Double
@@ -29,23 +29,23 @@ class CartInteractor: CartInteractorProtocol {
     }
     
     func getCartItems() -> [CartItem] {
-        return cartDataManager.getCartItems()
+        return cartDataManager.cartItems
     }
     
-    func addToCart(product: Product, quantity: Int = 1) {
-        cartDataManager.addToCart(product: product, quantity: quantity)
+    func addToCart(product: Product, quantity: Int = 1) async {
+        await cartDataManager.addToCart(product: product, quantity: quantity)
     }
     
-    func removeFromCart(productId: String) {
-        cartDataManager.removeFromCart(productId: productId)
+    func removeFromCart(itemId: String) async {
+        await cartDataManager.removeFromCart(itemId: itemId)
     }
     
-    func updateCartItemQuantity(productId: String, quantity: Int) {
-        cartDataManager.updateCartItemQuantity(productId: productId, quantity: quantity)
+    func updateCartItemQuantity(itemId: String, quantity: Int) async {
+        await cartDataManager.updateCartItemQuantity(itemId: itemId, quantity: quantity)
     }
     
-    func clearCart() {
-        cartDataManager.clearCart()
+    func clearCart() async {
+        await cartDataManager.clearCart()
     }
     
     func isInCart(productId: String) -> Bool {

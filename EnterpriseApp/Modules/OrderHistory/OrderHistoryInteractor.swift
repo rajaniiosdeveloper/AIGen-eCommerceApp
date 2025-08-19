@@ -28,6 +28,6 @@ class OrderHistoryInteractor: OrderHistoryInteractorProtocol {
             throw APIError(message: "User not authenticated", code: 401)
         }
         
-        return try await networkService.fetchOrders(userId: userId)
+        return try await networkService.fetchOrders(token: authManager.authToken ?? "")
     }
 }

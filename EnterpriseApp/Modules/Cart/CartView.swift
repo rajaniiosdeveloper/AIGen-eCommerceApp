@@ -124,7 +124,9 @@ struct CartView: View {
                                 }
                                 
                                 Button(action: {
-                                    presenter.clearCart()
+                                    Task {
+                                        await presenter.clearCart()
+                                    }
                                 }) {
                                     Text("Clear Cart")
                                         .fontWeight(.semibold)
@@ -190,10 +192,12 @@ struct CartItemRowView: View {
             VStack(spacing: 8) {
                 HStack(spacing: 12) {
                     Button(action: {
-                        presenter.updateCartItemQuantity(
-                            productId: cartItem.product.id,
-                            quantity: cartItem.quantity - 1
-                        )
+                        Task {
+                            await presenter.updateCartItemQuantity(
+                                itemId: cartItem.id,
+                                quantity: cartItem.quantity - 1
+                            )
+                        }
                     }) {
                         Image(systemName: "minus")
                             .font(.caption)
@@ -210,10 +214,12 @@ struct CartItemRowView: View {
                         .frame(minWidth: 20)
                     
                     Button(action: {
-                        presenter.updateCartItemQuantity(
-                            productId: cartItem.product.id,
-                            quantity: cartItem.quantity + 1
-                        )
+                        Task {
+                            await presenter.updateCartItemQuantity(
+                                itemId: cartItem.id,
+                                quantity: cartItem.quantity + 1
+                            )
+                        }
                     }) {
                         Image(systemName: "plus")
                             .font(.caption)
@@ -225,7 +231,9 @@ struct CartItemRowView: View {
                 }
                 
                 Button(action: {
-                    presenter.removeFromCart(productId: cartItem.product.id)
+                    Task {
+                        await presenter.removeFromCart(itemId: cartItem.id)
+                    }
                 }) {
                     Text("Remove")
                         .font(.caption)

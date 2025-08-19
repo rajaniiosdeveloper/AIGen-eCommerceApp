@@ -70,14 +70,9 @@ class AuthenticationManager: AuthenticationManagerProtocol, ObservableObject {
     }
     
     func refreshTokenIfNeeded() async throws {
-        guard let refreshToken = userDefaults.string(forKey: Keys.refreshToken),
-              let expiryDate = userDefaults.object(forKey: Keys.tokenExpiry) as? Date,
-              Date() > expiryDate else {
-            return
-        }
-        
-        let authResponse = try await networkService.refreshToken(refreshToken)
-        await handleAuthenticationSuccess(authResponse)
+        // TODO: Implement token refresh when the backend supports it
+        // For now, tokens don't expire in our local setup
+        return
     }
     
     // MARK: - Private Methods

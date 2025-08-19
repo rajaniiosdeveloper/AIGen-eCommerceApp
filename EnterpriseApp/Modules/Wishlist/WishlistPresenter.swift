@@ -14,10 +14,10 @@ protocol WishlistPresenterProtocol: ObservableObject {
     var wishlistItemCount: Int { get }
     
     func loadWishlistItems()
-    func addToWishlist(product: Product)
-    func removeFromWishlist(productId: String)
+    func addToWishlist(product: Product) async
+    func removeFromWishlist(itemId: String) async
     func isInWishlist(productId: String) -> Bool
-    func clearWishlist()
+    func clearWishlist() async
 }
 
 // MARK: - Wishlist Presenter Implementation
@@ -51,19 +51,19 @@ class WishlistPresenter: WishlistPresenterProtocol {
         wishlistItems = interactor.getWishlistItems()
     }
     
-    func addToWishlist(product: Product) {
-        interactor.addToWishlist(product: product)
+    func addToWishlist(product: Product) async {
+        await interactor.addToWishlist(product: product)
     }
     
-    func removeFromWishlist(productId: String) {
-        interactor.removeFromWishlist(productId: productId)
+    func removeFromWishlist(itemId: String) async {
+        await interactor.removeFromWishlist(itemId: itemId)
     }
     
     func isInWishlist(productId: String) -> Bool {
         return interactor.isInWishlist(productId: productId)
     }
     
-    func clearWishlist() {
-        interactor.clearWishlist()
+    func clearWishlist() async {
+        await interactor.clearWishlist()
     }
 }

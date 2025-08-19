@@ -93,7 +93,9 @@ struct WishlistView: View {
                 if !presenter.wishlistItems.isEmpty {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("Clear All") {
-                            presenter.clearWishlist()
+                            Task {
+                                await presenter.clearWishlist()
+                            }
                         }
                         .foregroundColor(.red)
                     }
@@ -143,7 +145,9 @@ struct WishlistItemRowView: View {
                 HStack(spacing: 12) {
                     Button(action: {
                         // Get cart data manager to add item
-                        CartDataManager.shared.addToCart(product: wishlistItem.product)
+                        Task {
+                            await CartDataManager.shared.addToCart(product: wishlistItem.product)
+                        }
                     }) {
                         HStack(spacing: 4) {
                             Image(systemName: "cart.badge.plus")
@@ -160,7 +164,9 @@ struct WishlistItemRowView: View {
                     }
                     
                     Button(action: {
-                        presenter.removeFromWishlist(productId: wishlistItem.product.id)
+                        Task {
+                            await presenter.removeFromWishlist(itemId: wishlistItem.id)
+                        }
                     }) {
                         HStack(spacing: 4) {
                             Image(systemName: "heart.slash")

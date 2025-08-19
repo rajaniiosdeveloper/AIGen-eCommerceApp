@@ -267,3 +267,60 @@ struct APIError: Error, Codable {
     let message: String
     let code: Int
 }
+
+// MARK: - Payment Models
+struct PaymentInfo: Codable {
+    let paymentId: String
+    let orderId: String
+    let amount: Double
+    let currency: String
+    let paymentMethod: String
+    let paymentUrl: String?
+    let expiresAt: String?
+}
+
+struct PaymentResult: Codable {
+    let paymentId: String
+    let status: String
+    let transactionId: String?
+    let processedAt: String
+}
+
+// MARK: - Network Error Handling
+enum NetworkError: Error, LocalizedError, Equatable {
+    case invalidURL
+    case noData
+    case decodingError(String)
+    case serverError(Int, String)
+    case unauthorized
+    case networkFailure(String)
+    case timeoutError
+    
+    var errorDescription: String? {
+        switch self {
+        case .invalidURL:
+            return "Invalid URL"
+        case .noData:
+            return "No data received"
+        case .decodingError(let message):
+            return "Failed to decode response: \(message)"
+        case .serverError(let code, let message):
+            return "Server error (\(code)): \(message)"
+        case .unauthorized:
+            return "Unauthorized access"
+        case .networkFailure(let message):
+            return "Network error: \(message)"
+        case .timeoutError:
+            return "Request timed out"
+        }
+    }
+    
+    // Helper to create from Error
+    static func fromError(_ error: Error) -> NetworkError {
+        if let networkError = error as? NetworkError {
+            return networkError
+        } else {
+            return .networkFailure(error.localizedDescription)
+        }
+    }
+}
